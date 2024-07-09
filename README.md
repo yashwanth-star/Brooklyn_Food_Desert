@@ -1,4 +1,3 @@
-# SampleFooddesert
 ---
 
 # Food Desert Analysis in Brooklyn
