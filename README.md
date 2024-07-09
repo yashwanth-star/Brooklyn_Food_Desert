@@ -50,13 +50,6 @@ pip install streamlit pandas numpy folium streamlit-folium matplotlib
    matplotlib
    ```
 
-### Running the App
-1. Run the Streamlit app:
-   ```bash
-   streamlit run app.py
-   ```
-2. Open your web browser and go to `http://localhost:8501` to view the app.
-
 ## Usage
 1. **Upload Data**: Ensure your data is properly formatted and uploaded.
 2. **Navigate**: Use the sidebar to navigate between Home, Data Visualization, Data Analysis, Comments, and Help pages.
