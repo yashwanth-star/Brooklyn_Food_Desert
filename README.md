@@ -69,5 +69,3 @@ pip install streamlit pandas numpy folium streamlit-folium matplotlib
 9. **Share App**: Share the app using the provided link.
 
 ---
-
-Feel free to customize this README to better suit your project details and specific requirements.
