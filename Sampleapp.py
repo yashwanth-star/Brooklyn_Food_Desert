@@ -99,7 +99,12 @@ elif page == "Data Visualization":
 
     # Load data
     if map_type == "LILA & Non-LILA Zones":
-        data = pd.read_csv('LILAZones_geo.csv')
+        try:
+            data = pd.read_csv('LILAZones_geo.csv')
+            st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error loading LILA Zones data: {e}")
+            data = pd.DataFrame()
     else:
         data = pd.DataFrame({
             'lat': [40.6782, 40.6792, 40.6802],
@@ -109,8 +114,9 @@ elif page == "Data Visualization":
         })
 
     # Create and display map
-    m = create_map(data, map_type, year)
-    st_folium(m, width=700, height=500)
+    if not data.empty:
+        m = create_map(data, map_type, year)
+        st_folium(m, width=700, height=500)
 
     # Search functionality for LILA & Non-LILA Zones
     search_query = st.sidebar.text_input("Search for Census Tract Area:")
@@ -123,10 +129,13 @@ elif page == "Data Visualization":
 
     # Download Options
     if st.sidebar.button("Download Data as CSV"):
-        csv = data.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="food_desert_data.csv">Download CSV File</a>'
-        st.sidebar.markdown(href, unsafe_allow_html=True)
+        if not data.empty:
+            csv = data.to_csv(index=False)
+            b64 = base64.b64encode(csv.encode()).decode()
+            href = f'<a href="data:file/csv;base64,{b64}" download="food_desert_data.csv">Download CSV File</a>'
+            st.sidebar.markdown(href, unsafe_allow_html=True)
+        else:
+            st.sidebar.error("No data available to download.")
 
     # Sharing Feature
     if st.sidebar.button("Share App"):
@@ -136,18 +145,22 @@ elif page == "Data Visualization":
 elif page == "Data Analysis":
     st.markdown('<div class="header">Data Analysis</div>', unsafe_allow_html=True)
     st.markdown('<div class="text">Basic analysis of the food desert data in Brooklyn.</div>', unsafe_allow_html=True)
-    data = pd.read_csv('/mnt/data/LILAZones_geo.csv')  # Replace with actual data path
-    st.write(data.describe())
+    try:
+        data = pd.read_csv('LILAZones_geo.csv')  # Replace with actual data path
+        st.write(data.describe())
+    except Exception as e:
+        st.error(f"Error loading data for analysis: {e}")
 
     # Example data visualization using matplotlib
-    st.markdown('<div class="text">Histogram of a Selected Column</div>', unsafe_allow_html=True)
-    column = st.selectbox("Select column for histogram", data.columns)
-    plt.figure(figsize=(10, 4))
-    plt.hist(data[column], bins=30, edgecolor='black')
-    plt.title(f'Histogram of {column}')
-    plt.xlabel(column)
-    plt.ylabel('Frequency')
-    st.pyplot(plt)
+    if not data.empty:
+        st.markdown('<div class="text">Histogram of a Selected Column</div>', unsafe_allow_html=True)
+        column = st.selectbox("Select column for histogram", data.columns)
+        plt.figure(figsize=(10, 4))
+        plt.hist(data[column], bins=30, edgecolor='black')
+        plt.title(f'Histogram of {column}')
+        plt.xlabel(column)
+        plt.ylabel('Frequency')
+        st.pyplot(plt)
 
 # Comments Page
 elif page == "Comments":
