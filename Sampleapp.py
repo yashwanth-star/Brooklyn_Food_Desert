@@ -33,18 +33,15 @@ def add_custom_css():
 def create_map(data, geo_data, map_type, year=None):
     m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
     if map_type == "LILA & Non-LILA Zones":
-        for _, row in data.iterrows():
+        for feature in geo_data['features']:
             try:
-                census_tract_area = row['Census Tract Area']
-                geojson_data = geo_data.get(census_tract_area)
-                if geojson_data:
-                    folium.GeoJson(
-                        geojson_data,
-                        tooltip=folium.GeoJsonTooltip(
-                            fields=['Census Tract Area', 'NTA Name', 'Food Index', 'Median Family Income', 'SNAP Benefits %'],
-                            aliases=['Census Tract Area:', 'NTA Name:', 'Food Index:', 'Median Family Income:', 'SNAP Benefits %:'],
-                        )
-                    ).add_to(m)
+                folium.GeoJson(
+                    feature,
+                    tooltip=folium.GeoJsonTooltip(
+                        fields=['Census Tract Area', 'NTA Name', 'Food Index', 'Median Family Income', 'SNAP Benefits %'],
+                        aliases=['Census Tract Area:', 'NTA Name:', 'Food Index:', 'Median Family Income:', 'SNAP Benefits %:'],
+                    )
+                ).add_to(m)
             except Exception as e:
                 st.error(f"Error processing GeoJSON data: {e}")
     else:
@@ -56,26 +53,24 @@ def create_map(data, geo_data, map_type, year=None):
     return m
 
 # Function to search and highlight a specific Census Tract Area
-def search_census_tract(data, geo_data, tract_area):
-    tract_info = data[data['Census Tract Area'] == tract_area]
-    if not tract_info.empty:
-        try:
-            geojson_data = geo_data.get(tract_area)
-            if geojson_data:
-                m = folium.Map(location=[geojson_data['coordinates'][0][0][1], geojson_data['coordinates'][0][0][0]], zoom_start=14)
+def search_census_tract(geo_data, tract_area):
+    for feature in geo_data['features']:
+        if feature['properties']['Census Tract Area'] == tract_area:
+            try:
+                coords = feature['geometry']['coordinates'][0][0]
+                m = folium.Map(location=[coords[1], coords[0]], zoom_start=14)
                 folium.GeoJson(
-                    geojson_data,
+                    feature,
                     tooltip=folium.GeoJsonTooltip(
                         fields=['Census Tract Area', 'NTA Name', 'Food Index', 'Median Family Income', 'SNAP Benefits %'],
                         aliases=['Census Tract Area:', 'NTA Name:', 'Food Index:', 'Median Family Income:', 'SNAP Benefits %:'],
                     )
                 ).add_to(m)
                 return m
-        except Exception as e:
-            st.error(f"Error processing GeoJSON data: {e}")
-            return None
-    else:
-        return None
+            except Exception as e:
+                st.error(f"Error processing GeoJSON data: {e}")
+                return None
+    return None
 
 # Add custom CSS
 add_custom_css()
@@ -108,7 +103,7 @@ elif page == "Data Visualization":
     try:
         data = pd.read_csv('LILAZones_geo.csv')
         with open('LILAZones_geo_corrected_new.json', 'r') as f:
-            geo_data = {feature['properties']['Census Tract Area']: feature for feature in json.load(f)['features']}
+            geo_data = json.load(f)
         st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error loading data: {e}")
@@ -123,7 +118,7 @@ elif page == "Data Visualization":
     # Search functionality for all map types
     search_query = st.sidebar.text_input("Search for Census Tract Area:")
     if st.sidebar.button("Search"):
-        search_map = search_census_tract(data, geo_data, search_query)
+        search_map = search_census_tract(geo_data, search_query)
         if search_map:
             st_folium(search_map, width=700, height=500)
         else:
