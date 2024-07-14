@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import folium
 from streamlit_folium import st_folium
 import base64
@@ -108,7 +109,7 @@ elif page == "Data Visualization":
     # Load data
     if map_type == "LILA & Non-LILA Zones":
         try:
-            data = pd.read_csv('LILAZones_geo_corrected.csv')
+            data = pd.read_csv('C:/Users/Akash J/Downloads/LILAZones_geo_corrected.csv')
             st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error loading LILA Zones data: {e}")
