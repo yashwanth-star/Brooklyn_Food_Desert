@@ -112,14 +112,15 @@ elif page == "Data Visualization":
     m = create_map(data, map_type, year)
     st_folium(m, width=700, height=500)
 
-    # Search functionality
-    search_query = st.sidebar.text_input("Search for Census Tract Area:")
-    if st.sidebar.button("Search"):
-        search_map = search_census_tract(data, search_query)
-        if search_map:
-            st_folium(search_map, width=700, height=500)
-        else:
-            st.sidebar.error("Census Tract Area not found.")
+    # Search functionality for LILA & Non-LILA Zones
+    if map_type == "LILA & Non-LILA Zones":
+        search_query = st.sidebar.text_input("Search for Census Tract Area:")
+        if st.sidebar.button("Search"):
+            search_map = search_census_tract(data, search_query)
+            if search_map:
+                st_folium(search_map, width=700, height=500)
+            else:
+                st.sidebar.error("Census Tract Area not found.")
 
 # Data Analysis Page
 elif page == "Data Analysis":
@@ -145,7 +146,7 @@ elif page == "Comments":
 
 # Help Page
 elif page == "Help":
-    st.markdown('<div="header">Help and Tutorial</div>', unsafe_allow_html=True)
+    st.markdown('<div class="header">Help and Tutorial</div>', unsafe_allow_html=True)
     st.markdown('<div class="text">How to effectively use the app:</div>', unsafe_allow_html=True)
     st.markdown('1. Use the sidebar to select different map types and years.')
     st.markdown('2. Hover over areas to see detailed information.')
