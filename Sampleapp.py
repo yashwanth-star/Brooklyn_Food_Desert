@@ -38,8 +38,20 @@ def create_map(data, map_type, year=None):
             try:
                 geom = shapely.wkt.loads(row['geometry'])
                 geojson_data = shapely.geometry.mapping(geom)
+                geojson_feature = {
+                    "type": "Feature",
+                    "geometry": geojson_data,
+                    "properties": {
+                        "Census Tract Area": row['Census Tract Area'],
+                        "NTA": row['NTA'],
+                        "Food Index": row['Food Index'],
+                        "Median Family Income": row['Median Family Income'],
+                        "Poverty Rate": row['Poverty Rate'],
+                        "SNAP Benefits": row['SNAP Benefits']
+                    }
+                }
                 folium.GeoJson(
-                    geojson_data,
+                    geojson_feature,
                     tooltip=folium.GeoJsonTooltip(
                         fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
                         aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
@@ -63,9 +75,21 @@ def search_census_tract(data, tract_area):
         try:
             geom = shapely.wkt.loads(tract_info.iloc[0]['geometry'])
             geojson_data = shapely.geometry.mapping(geom)
+            geojson_feature = {
+                "type": "Feature",
+                "geometry": geojson_data,
+                "properties": {
+                    "Census Tract Area": tract_info.iloc[0]['Census Tract Area'],
+                    "NTA": tract_info.iloc[0]['NTA'],
+                    "Food Index": tract_info.iloc[0]['Food Index'],
+                    "Median Family Income": tract_info.iloc[0]['Median Family Income'],
+                    "Poverty Rate": tract_info.iloc[0]['Poverty Rate'],
+                    "SNAP Benefits": tract_info.iloc[0]['SNAP Benefits']
+                }
+            }
             m = folium.Map(location=[geom.centroid.y, geom.centroid.x], zoom_start=14)
             folium.GeoJson(
-                geojson_data,
+                geojson_feature,
                 tooltip=folium.GeoJsonTooltip(
                     fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
                     aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
