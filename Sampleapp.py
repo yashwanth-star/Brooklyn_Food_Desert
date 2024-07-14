@@ -99,7 +99,7 @@ elif page == "Data Visualization":
 
     # Load data
     if map_type == "LILA & Non-LILA Zones":
-        data = pd.read_csv('LILAZones_geo.csv')
+        data = pd.read_csv('/mnt/data/LILAZones_geo.csv')
     else:
         data = pd.DataFrame({
             'lat': [40.6782, 40.6792, 40.6802],
@@ -145,7 +145,7 @@ elif page == "Comments":
 
 # Help Page
 elif page == "Help":
-    st.markdown('<div class="header">Help and Tutorial</div>', unsafe_allow_html=True)
+    st.markdown('<div="header">Help and Tutorial</div>', unsafe_allow_html=True)
     st.markdown('<div class="text">How to effectively use the app:</div>', unsafe_allow_html=True)
     st.markdown('1. Use the sidebar to select different map types and years.')
     st.markdown('2. Hover over areas to see detailed information.')
