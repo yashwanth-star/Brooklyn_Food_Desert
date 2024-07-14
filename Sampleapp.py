@@ -96,9 +96,6 @@ elif page == "Data Visualization":
     # Select map type
     map_type = st.sidebar.radio("Select from any 3 Maps", ["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
     
-    # Show year selection for all map types
-    year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
-
     # Load data
     try:
         data = pd.read_csv('LILAZones_geo.csv')
@@ -109,6 +106,12 @@ elif page == "Data Visualization":
         st.error(f"Error loading data: {e}")
         data = pd.DataFrame()
         geo_data = {}
+
+    if map_type == "LILA & Non-LILA Zones":
+        year = None  # No year selection for LILA & Non-LILA Zones
+    else:
+        # Show year selection for "Supermarket Coverage Ratio" and "Fast Food Coverage Ratio"
+        year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
 
     # Create and display map
     if not data.empty:
