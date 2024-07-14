@@ -99,7 +99,7 @@ elif page == "Data Visualization":
 
     # Load data
     if map_type == "LILA & Non-LILA Zones":
-        data = pd.read_csv('/mnt/data/LILAZones_geo.csv')
+        data = pd.read_csv('LILAZones_geo.csv')
     else:
         data = pd.DataFrame({
             'lat': [40.6782, 40.6792, 40.6802],
