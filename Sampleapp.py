@@ -5,6 +5,7 @@ import folium
 from streamlit_folium import st_folium
 import base64
 import matplotlib.pyplot as plt
+import json
 
 # Function to add custom CSS for styling
 def add_custom_css():
@@ -36,7 +37,7 @@ def create_map(data, map_type, year=None):
     if map_type == "LILA & Non-LILA Zones":
         for _, row in data.iterrows():
             folium.GeoJson(
-                row['geometry'],
+                json.loads(row['geometry']),
                 tooltip=folium.GeoJsonTooltip(
                     fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
                     aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
@@ -54,8 +55,8 @@ def create_map(data, map_type, year=None):
 def search_census_tract(data, tract_area):
     tract_info = data[data['Census Tract Area'] == tract_area]
     if not tract_info.empty:
-        tract_geo = tract_info.iloc[0]['geometry']
-        m = folium.Map(location=[tract_geo.centroid.y, tract_geo.centroid.x], zoom_start=14)
+        tract_geo = json.loads(tract_info.iloc[0]['geometry'])
+        m = folium.Map(location=[tract_geo['coordinates'][0][0][1], tract_geo['coordinates'][0][0][0]], zoom_start=14)
         folium.GeoJson(
             tract_geo,
             tooltip=folium.GeoJsonTooltip(
@@ -76,7 +77,7 @@ st.sidebar.markdown('<div class="sidebar">Navigation</div>', unsafe_allow_html=T
 st.sidebar.markdown('<div class="sidebar">Choose a page:</div>', unsafe_allow_html=True)
 
 # Page Selection
-page = st.sidebar.selectbox("Select Page", ["Home", "Data Visualization", "Data Analysis", "Comments", "Help"])
+page = st.sidebar.selectbox("Select Page", ["Home", "Data Visualization", "Comments", "Help"])
 
 # Home Page
 if page == "Home":
@@ -137,27 +138,6 @@ elif page == "Data Visualization":
     # Sharing Feature
     if st.sidebar.button("Share App"):
         st.sidebar.markdown("Share this app using the link: [App Link](http://example.com)")
-
-# Data Analysis Page
-elif page == "Data Analysis":
-    st.markdown('<div class="header">Data Analysis</div>', unsafe_allow_html=True)
-    st.markdown('<div class="text">Basic analysis of the food desert data in Brooklyn.</div>', unsafe_allow_html=True)
-    try:
-        data = pd.read_csv('LILAZones_geo.csv')  # Replace with actual data path
-        st.write(data.describe())
-    except Exception as e:
-        st.error(f"Error loading data for analysis: {e}")
-
-    # Example data visualization using matplotlib
-    if not data.empty:
-        st.markdown('<div class="text">Histogram of a Selected Column</div>', unsafe_allow_html=True)
-        column = st.selectbox("Select column for histogram", data.columns)
-        plt.figure(figsize=(10, 4))
-        plt.hist(data[column], bins=30, edgecolor='black')
-        plt.title(f'Histogram of {column}')
-        plt.xlabel(column)
-        plt.ylabel('Frequency')
-        st.pyplot(plt)
 
 # Comments Page
 elif page == "Comments":
