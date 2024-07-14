@@ -108,7 +108,7 @@ elif page == "Data Visualization":
     try:
         data = pd.read_csv('LILAZones_geo.csv')
         with open('LILAZones_geo_corrected_new.json', 'r') as f:
-            geo_data = {feature['properties']['Census Tract Area']: feature['geometry'] for feature in json.load(f)['features']}
+            geo_data = {feature['properties']['Census Tract Area']: feature for feature in json.load(f)['features']}
         st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error loading data: {e}")
