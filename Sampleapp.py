@@ -91,11 +91,8 @@ elif page == "Data Visualization":
     # Select map type
     map_type = st.sidebar.radio("Select from any 3 Maps", ["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
     
-    # Show year selection only for "Supermarket Coverage Ratio" and "Fast Food Coverage Ratio"
-    if map_type in ["Supermarket Coverage Ratio", "Fast Food Coverage Ratio"]:
-        year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
-    else:
-        year = None
+    # Show year selection for all map types
+    year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
 
     # Load data
     if map_type == "LILA & Non-LILA Zones":
@@ -118,7 +115,7 @@ elif page == "Data Visualization":
         m = create_map(data, map_type, year)
         st_folium(m, width=700, height=500)
 
-    # Search functionality for LILA & Non-LILA Zones
+    # Search functionality for all map types
     search_query = st.sidebar.text_input("Search for Census Tract Area:")
     if st.sidebar.button("Search"):
         search_map = search_census_tract(data, search_query)
