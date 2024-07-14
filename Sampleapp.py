@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import folium
 from streamlit_folium import st_folium
-import shapely.wkt
-import shapely.geometry
+import base64
+import matplotlib.pyplot as plt
 import json
 
 # Function to add custom CSS for styling
@@ -31,35 +32,24 @@ def add_custom_css():
     )
 
 # Function to create a Folium map
-def create_map(data, map_type, year=None):
+def create_map(data, geo_data, map_type, year=None):
     m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
     if map_type == "LILA & Non-LILA Zones":
         for _, row in data.iterrows():
             try:
-                geom = shapely.wkt.loads(row['geometry'])
-                geojson_data = shapely.geometry.mapping(geom)
-                geojson_feature = {
-                    "type": "Feature",
-                    "geometry": geojson_data,
-                    "properties": {
-                        "Census Tract Area": row['Census Tract Area'],
-                        "NTA": row['NTA'],
-                        "Food Index": row['Food Index'],
-                        "Median Family Income": row['Median Family Income'],
-                        "Poverty Rate": row['Poverty Rate'],
-                        "SNAP Benefits": row['SNAP Benefits']
-                    }
-                }
-                folium.GeoJson(
-                    geojson_feature,
-                    tooltip=folium.GeoJsonTooltip(
-                        fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
-                        aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-                    )
-                ).add_to(m)
+                tract_id = row['Census Tract Area']
+                geojson_data = next((feature['geometry'] for feature in geo_data['features'] if feature['properties']['Census Tract Area'] == tract_id), None)
+                if geojson_data:
+                    folium.GeoJson(
+                        geojson_data,
+                        tooltip=folium.GeoJsonTooltip(
+                            fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
+                            aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
+                            localize=True
+                        )
+                    ).add_to(m)
             except Exception as e:
                 st.error(f"Error processing GeoJSON data: {e}")
-                st.error(row['geometry'])
     else:
         if year:
             # Filter data based on the selected year
@@ -69,36 +59,24 @@ def create_map(data, map_type, year=None):
     return m
 
 # Function to search and highlight a specific Census Tract Area
-def search_census_tract(data, tract_area):
+def search_census_tract(data, geo_data, tract_area):
     tract_info = data[data['Census Tract Area'] == tract_area]
     if not tract_info.empty:
         try:
-            geom = shapely.wkt.loads(tract_info.iloc[0]['geometry'])
-            geojson_data = shapely.geometry.mapping(geom)
-            geojson_feature = {
-                "type": "Feature",
-                "geometry": geojson_data,
-                "properties": {
-                    "Census Tract Area": tract_info.iloc[0]['Census Tract Area'],
-                    "NTA": tract_info.iloc[0]['NTA'],
-                    "Food Index": tract_info.iloc[0]['Food Index'],
-                    "Median Family Income": tract_info.iloc[0]['Median Family Income'],
-                    "Poverty Rate": tract_info.iloc[0]['Poverty Rate'],
-                    "SNAP Benefits": tract_info.iloc[0]['SNAP Benefits']
-                }
-            }
-            m = folium.Map(location=[geom.centroid.y, geom.centroid.x], zoom_start=14)
-            folium.GeoJson(
-                geojson_feature,
-                tooltip=folium.GeoJsonTooltip(
-                    fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
-                    aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-                )
-            ).add_to(m)
-            return m
+            geojson_data = next((feature['geometry'] for feature in geo_data['features'] if feature['properties']['Census Tract Area'] == tract_area), None)
+            if geojson_data:
+                m = folium.Map(location=[geojson_data['coordinates'][0][0][1], geojson_data['coordinates'][0][0][0]], zoom_start=14)
+                folium.GeoJson(
+                    geojson_data,
+                    tooltip=folium.GeoJsonTooltip(
+                        fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
+                        aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
+                        localize=True
+                    )
+                ).add_to(m)
+                return m
         except Exception as e:
             st.error(f"Error processing GeoJSON data: {e}")
-            st.error(tract_info.iloc[0]['geometry'])
             return None
     else:
         return None
@@ -131,30 +109,25 @@ elif page == "Data Visualization":
     year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
 
     # Load data
-    if map_type == "LILA & Non-LILA Zones":
-        try:
-            data = pd.read_csv('LILAZones_geo_corrected.csv')
-            st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
-        except Exception as e:
-            st.error(f"Error loading LILA Zones data: {e}")
-            data = pd.DataFrame()
-    else:
-        data = pd.DataFrame({
-            'lat': [40.6782, 40.6792, 40.6802],
-            'lon': [-73.9442, -73.9452, -73.9462],
-            'popup_info': ['Info 1', 'Info 2', 'Info 3'],
-            'Year': [2015, 2016, 2017]
-        })
+    try:
+        data = pd.read_csv('LILAZones_geo.csv')
+        with open('LILAZones_geo_corrected_new.json') as f:
+            geo_data = json.load(f)
+        st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        data = pd.DataFrame()
+        geo_data = {}
 
     # Create and display map
     if not data.empty:
-        m = create_map(data, map_type, year)
+        m = create_map(data, geo_data, map_type, year)
         st_folium(m, width=700, height=500)
 
     # Search functionality for all map types
     search_query = st.sidebar.text_input("Search for Census Tract Area:")
     if st.sidebar.button("Search"):
-        search_map = search_census_tract(data, search_query)
+        search_map = search_census_tract(data, geo_data, search_query)
         if search_map:
             st_folium(search_map, width=700, height=500)
         else:
