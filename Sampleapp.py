@@ -106,7 +106,7 @@ elif page == "Data Visualization":
     # Load data
     if map_type == "LILA & Non-LILA Zones":
         try:
-            data = pd.read_csv('LILAZones_geo.csv')
+            data = pd.read_csv('LILAZones1_geo.csv')
             st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error loading LILA Zones data: {e}")
