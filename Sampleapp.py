@@ -49,6 +49,7 @@ def create_map(data, map_type, year=None):
                 ).add_to(m)
             except Exception as e:
                 st.error(f"Error processing GeoJSON data: {e}")
+                st.error(row['geometry'])
     else:
         if year:
             # Filter data based on the selected year
@@ -75,6 +76,7 @@ def search_census_tract(data, tract_area):
             return m
         except Exception as e:
             st.error(f"Error processing GeoJSON data: {e}")
+            st.error(tract_info.iloc[0]['geometry'])
             return None
     else:
         return None
@@ -109,7 +111,7 @@ elif page == "Data Visualization":
     # Load data
     if map_type == "LILA & Non-LILA Zones":
         try:
-            data = pd.read_csv('LILAZones_geo_corrected.csv')
+            data = pd.read_csv('C:/Users/Akash J/Downloads/LILAZones_geo_corrected.csv')
             st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error loading LILA Zones data: {e}")
