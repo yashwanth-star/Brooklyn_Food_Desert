@@ -113,14 +113,24 @@ elif page == "Data Visualization":
     st_folium(m, width=700, height=500)
 
     # Search functionality for LILA & Non-LILA Zones
-    if map_type == "LILA & Non-LILA Zones":
-        search_query = st.sidebar.text_input("Search for Census Tract Area:")
-        if st.sidebar.button("Search"):
-            search_map = search_census_tract(data, search_query)
-            if search_map:
-                st_folium(search_map, width=700, height=500)
-            else:
-                st.sidebar.error("Census Tract Area not found.")
+    search_query = st.sidebar.text_input("Search for Census Tract Area:")
+    if st.sidebar.button("Search"):
+        search_map = search_census_tract(data, search_query)
+        if search_map:
+            st_folium(search_map, width=700, height=500)
+        else:
+            st.sidebar.error("Census Tract Area not found.")
+
+    # Download Options
+    if st.sidebar.button("Download Data as CSV"):
+        csv = data.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode()
+        href = f'<a href="data:file/csv;base64,{b64}" download="food_desert_data.csv">Download CSV File</a>'
+        st.sidebar.markdown(href, unsafe_allow_html=True)
+
+    # Sharing Feature
+    if st.sidebar.button("Share App"):
+        st.sidebar.markdown("Share this app using the link: [App Link](http://example.com)")
 
 # Data Analysis Page
 elif page == "Data Analysis":
@@ -151,17 +161,6 @@ elif page == "Help":
     st.markdown('1. Use the sidebar to select different map types and years.')
     st.markdown('2. Hover over areas to see detailed information.')
     st.markdown('3. Click on areas to see more details or navigate to other sections.')
-
-# Download Options
-if st.sidebar.button("Download Data as CSV"):
-    csv = data.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="food_desert_data.csv">Download CSV File</a>'
-    st.sidebar.markdown(href, unsafe_allow_html=True)
-
-# Sharing Feature
-if st.sidebar.button("Share App"):
-    st.sidebar.markdown("Share this app using the link: [App Link](http://example.com)")
 
 # Display main map on the page
 if page == "Home" or page == "Data Visualization":
