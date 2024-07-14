@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import folium
 from streamlit_folium import st_folium
 import base64
-import matplotlib.pyplot as plt
+import shapely.wkt
+import shapely.geometry
 import json
 
 # Function to add custom CSS for styling
@@ -37,7 +37,8 @@ def create_map(data, map_type, year=None):
     if map_type == "LILA & Non-LILA Zones":
         for _, row in data.iterrows():
             try:
-                geojson_data = json.loads(row['geometry'])
+                geom = shapely.wkt.loads(row['geometry'])
+                geojson_data = shapely.geometry.mapping(geom)
                 folium.GeoJson(
                     geojson_data,
                     tooltip=folium.GeoJsonTooltip(
@@ -60,10 +61,11 @@ def search_census_tract(data, tract_area):
     tract_info = data[data['Census Tract Area'] == tract_area]
     if not tract_info.empty:
         try:
-            tract_geo = json.loads(tract_info.iloc[0]['geometry'])
-            m = folium.Map(location=[tract_geo['coordinates'][0][0][1], tract_geo['coordinates'][0][0][0]], zoom_start=14)
+            geom = shapely.wkt.loads(tract_info.iloc[0]['geometry'])
+            geojson_data = shapely.geometry.mapping(geom)
+            m = folium.Map(location=[geom.centroid.y, geom.centroid.x], zoom_start=14)
             folium.GeoJson(
-                tract_geo,
+                geojson_data,
                 tooltip=folium.GeoJsonTooltip(
                     fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
                     aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
