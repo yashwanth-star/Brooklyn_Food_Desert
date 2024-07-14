@@ -21,7 +21,7 @@ def add_custom_css():
         }
         .header {
             font-size: 36px;
-            font-weight: bold.
+            font-weight: bold;
         }
         .text {
             font-size: 24px;
@@ -36,13 +36,17 @@ def create_map(data, map_type, year=None):
     m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
     if map_type == "LILA & Non-LILA Zones":
         for _, row in data.iterrows():
-            folium.GeoJson(
-                json.loads(row['geometry']),
-                tooltip=folium.GeoJsonTooltip(
-                    fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
-                    aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-                )
-            ).add_to(m)
+            try:
+                geojson_data = json.loads(row['geometry'])
+                folium.GeoJson(
+                    geojson_data,
+                    tooltip=folium.GeoJsonTooltip(
+                        fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
+                        aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
+                    )
+                ).add_to(m)
+            except Exception as e:
+                st.error(f"Error processing GeoJSON data: {e}")
     else:
         if year:
             # Filter data based on the selected year
@@ -55,16 +59,20 @@ def create_map(data, map_type, year=None):
 def search_census_tract(data, tract_area):
     tract_info = data[data['Census Tract Area'] == tract_area]
     if not tract_info.empty:
-        tract_geo = json.loads(tract_info.iloc[0]['geometry'])
-        m = folium.Map(location=[tract_geo['coordinates'][0][0][1], tract_geo['coordinates'][0][0][0]], zoom_start=14)
-        folium.GeoJson(
-            tract_geo,
-            tooltip=folium.GeoJsonTooltip(
-                fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
-                aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-            )
-        ).add_to(m)
-        return m
+        try:
+            tract_geo = json.loads(tract_info.iloc[0]['geometry'])
+            m = folium.Map(location=[tract_geo['coordinates'][0][0][1], tract_geo['coordinates'][0][0][0]], zoom_start=14)
+            folium.GeoJson(
+                tract_geo,
+                tooltip=folium.GeoJsonTooltip(
+                    fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
+                    aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
+                )
+            ).add_to(m)
+            return m
+        except Exception as e:
+            st.error(f"Error processing GeoJSON data: {e}")
+            return None
     else:
         return None
 
@@ -100,7 +108,6 @@ elif page == "Data Visualization":
         try:
             data = pd.read_csv('LILAZones_geo.csv')
             st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
-            st.write(data.head())  # Display the first few rows of the data for inspection
         except Exception as e:
             st.error(f"Error loading LILA Zones data: {e}")
             data = pd.DataFrame()
