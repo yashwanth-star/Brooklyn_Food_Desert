@@ -21,7 +21,7 @@ def add_custom_css():
         }
         .header {
             font-size: 36px;
-            font-weight: bold;
+            font-weight: bold.
         }
         .text {
             font-size: 24px;
@@ -98,8 +98,9 @@ elif page == "Data Visualization":
     # Load data
     if map_type == "LILA & Non-LILA Zones":
         try:
-            data = pd.read_csv('LILAZones_geo.csv')
+            data = pd.read_csv('/mnt/data/LILAZones_geo.csv')
             st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
+            st.write(data.head())  # Display the first few rows of the data for inspection
         except Exception as e:
             st.error(f"Error loading LILA Zones data: {e}")
             data = pd.DataFrame()
