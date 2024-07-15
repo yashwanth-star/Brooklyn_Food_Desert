@@ -34,10 +34,12 @@ def main():
         st.header("Data Visualization")
         st.write("Visualize different aspects of food deserts in Brooklyn.")
         
-        # Sidebar for map selection
-        map_option = st.sidebar.selectbox("Choose a map:", ["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
+        # Sidebar for map selection with radio buttons
+        map_option = st.sidebar.radio("Choose a map:", ["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
 
         if map_option == "LILA & Non-LILA Zones":
+            st.subheader("LILA & Non-LILA Zones")
+            
             # Load data
             gdf = load_data()
 
@@ -127,10 +129,12 @@ def main():
             st.sidebar.markdown(share_button_html, unsafe_allow_html=True)
 
         elif map_option == "Supermarket Coverage Ratio":
+            st.subheader("Supermarket Coverage Ratio")
             # Placeholder for Supermarket Coverage Ratio functionality
             st.write("Supermarket Coverage Ratio functionality to be added.")
         
         elif map_option == "Fast Food Coverage Ratio":
+            st.subheader("Fast Food Coverage Ratio")
             # Placeholder for Fast Food Coverage Ratio functionality
             st.write("Fast Food Coverage Ratio functionality to be added.")
     
