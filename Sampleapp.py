@@ -32,8 +32,7 @@ def add_custom_css():
 def create_map(data, map_type, year=None):
     m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
     if map_type == "LILA & Non-LILA Zones":
-        # Display map similar to "Supermarket Coverage Ratio" and "Fast Food Coverage Ratio"
-        folium.TileLayer('Stamen Toner').add_to(m)
+        folium.TileLayer('Stamen Toner').add_to(m)  # Displaying map similar to other map types
     else:
         if year:
             # Filter data based on the selected year
