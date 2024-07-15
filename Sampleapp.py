@@ -9,7 +9,7 @@ import base64
 # Load the data
 @st.cache_data
 def load_data():
-    data = pd.read_csv('C:/Users/Akash J/Downloads/LILAZones_geo.csv')
+    data = pd.read_csv('LILAZones_geo.csv')
     data['geometry'] = data['geometry'].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(data, geometry='geometry')
     gdf.set_crs(epsg=4326, inplace=True)  # Set CRS to WGS84
