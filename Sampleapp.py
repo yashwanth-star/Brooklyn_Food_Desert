@@ -5,14 +5,15 @@ from streamlit_folium import st_folium
 import base64
 import json
 from shapely import wkt
-from geopandas import GeoDataFrame
 
 # Function to create a Folium map
 def create_map(data, year):
     m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
     for _, row in data.iterrows():
         try:
-            geojson_data = json.loads(row['geometry'])
+            # Convert WKT to GeoJSON format
+            polygon = wkt.loads(row['geometry'])
+            geojson_data = json.loads(json.dumps(polygon.__geo_interface__))
             folium.GeoJson(
                 geojson_data,
                 tooltip=folium.GeoJsonTooltip(
@@ -21,7 +22,7 @@ def create_map(data, year):
                 )
             ).add_to(m)
         except Exception as e:
-            st.error(f"Error processing GeoJSON data: {e}")
+            st.error(f"Error processing GeoJSON data for GEOID {row['GEOID']}: {e}")
     return m
 
 # Title and Sidebar
@@ -51,8 +52,6 @@ elif page == "Data Visualization":
     # Load data
     try:
         data = pd.read_csv('supermarkets.csv')
-        # Convert the 'geometry' column to proper GeoJSON format
-        data['geometry'] = data['geometry'].apply(lambda x: json.dumps(wkt.loads(x).__geo_interface__))
         st.write("Data loaded successfully!")
     except Exception as e:
         st.error(f"Error loading data: {e}")
