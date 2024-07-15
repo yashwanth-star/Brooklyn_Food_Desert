@@ -1,165 +1,127 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import geopandas as gpd
 import folium
 from streamlit_folium import st_folium
-import base64
-import matplotlib.pyplot as plt
-import json
+from shapely import wkt
 
-# Function to add custom CSS for styling
-def add_custom_css():
-    st.markdown(
+# Function to load and process data
+@st.cache_data
+def load_data():
+    data = pd.read_csv('C:/Users/Akash J/Downloads/LILAZones_geo.csv')
+    data['geometry'] = data['geometry'].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(data, geometry='geometry')
+    gdf.set_crs(epsg=4326, inplace=True)  # Set CRS to WGS84
+    return gdf
+
+# Function to convert DataFrame to CSV
+def convert_df_to_csv(df):
+    return df.to_csv(index=False).encode('utf-8')
+
+# Main function to create the app
+def main():
+    st.title("Food Desert Analysis in Brooklyn")
+    
+    # Sidebar navigation
+    st.sidebar.markdown("## Navigation")
+    map_option = st.sidebar.selectbox("Choose a map:", ["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
+
+    if map_option == "LILA & Non-LILA Zones":
+        # Load data
+        gdf = load_data()
+
+        # Convert DataFrame to CSV
+        csv = convert_df_to_csv(gdf)
+
+        # Create a download button in the sidebar
+        st.sidebar.download_button(
+            label="Download Data as CSV",
+            data=csv,
+            file_name='LILAZones_geo.csv',
+            mime='text/csv',
+        )
+
+        # Create a search option with suggestions for NTA names including "All"
+        nta_names = ["All"] + list(gdf['NTA Name'].unique())
+        selected_nta = st.sidebar.selectbox("Search for NTA Name:", nta_names)
+
+        # Filter the data based on the selected NTA name
+        if selected_nta != "All":
+            filtered_gdf = gdf[gdf['NTA Name'] == selected_nta]
+        else:
+            filtered_gdf = gdf
+
+        # Create a folium map centered around the data
+        m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)
+
+        # Add the GeoDataFrame to the map
+        folium.GeoJson(
+            filtered_gdf,
+            style_function=lambda feature: {
+                'fillColor': 'red',
+                'color': 'red',
+                'weight': 1,
+                'fillOpacity': 0.6,
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=[
+                    'NTA Name', 'Food Index', 
+                    ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %'
+                ],
+                aliases=[
+                    'NTA Name:', 'Food Index:', 
+                    'Median Family Income (USD):', 'Poverty Rate (%):', 'SNAP Benefits (%):'
+                ],
+                localize=True
+            )
+        ).add_to(m)
+
+        # Display the map
+        st_folium(m, width=800, height=600)
+
+        # Display the tooltip information below the map if a specific NTA name is selected
+        if selected_nta != "All":
+            st.markdown(f"## Details for {selected_nta}")
+            info = filtered_gdf[['NTA Name', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']].iloc[0]
+            st.markdown(f"""
+                **NTA Name:** {info['NTA Name']}  
+                **Food Index:** {info['Food Index']}  
+                **Median Family Income (USD):** {info[' Median Family Income ']}  
+                **Poverty Rate (%):** {info['Education below high school diploma (Poverty Rate)']}  
+                **SNAP Benefits (%):** {info['SNAP Benefits %']}  
+            """)
+
+        # Add a beautified share button
+        st.sidebar.markdown("## Share App")
+        shareable_link = "http://example.com"  # Replace with your app's link
+        share_button_html = f"""
+        <a href="{shareable_link}" target="_blank">
+            <button style="
+                background-color: #4CAF50; /* Green */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 12px;
+            ">
+                Share this app
+            </button>
+        </a>
         """
-        <style>
-        .title {
-            font-size: 48px;
-            font-weight: bold;
-        }
-        .sidebar .sidebar-content {
-            font-size: 24px;
-        }
-        .header {
-            font-size: 36px;
-            font-weight: bold;
-        }
-        .text {
-            font-size: 24px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+        st.sidebar.markdown(share_button_html, unsafe_allow_html=True)
 
-# Function to create a Folium map
-def create_map(data, map_type, year=None):
-    m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
-    if map_type == "LILA & Non-LILA Zones":
-        for _, row in data.iterrows():
-            try:
-                geojson_data = json.loads(row['geometry'])
-                folium.GeoJson(
-                    geojson_data,
-                    tooltip=folium.GeoJsonTooltip(
-                        fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
-                        aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-                    )
-                ).add_to(m)
-            except Exception as e:
-                st.error(f"Error processing GeoJSON data: {e}")
-    else:
-        if year:
-            # Filter data based on the selected year
-            filtered_data = data[data['Year'] == year]
-            for _, row in filtered_data.iterrows():
-                folium.Marker(location=[row['lat'], row['lon']], popup=row['popup_info']).add_to(m)
-    return m
-
-# Function to search and highlight a specific Census Tract Area
-def search_census_tract(data, tract_area):
-    tract_info = data[data['Census Tract Area'] == tract_area]
-    if not tract_info.empty:
-        try:
-            tract_geo = json.loads(tract_info.iloc[0]['geometry'])
-            m = folium.Map(location=[tract_geo['coordinates'][0][0][1], tract_geo['coordinates'][0][0][0]], zoom_start=14)
-            folium.GeoJson(
-                tract_geo,
-                tooltip=folium.GeoJsonTooltip(
-                    fields=['Census Tract Area', 'NTA', 'Food Index', 'Median Family Income', 'Poverty Rate', 'SNAP Benefits'],
-                    aliases=['Census Tract Area:', 'NTA:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-                )
-            ).add_to(m)
-            return m
-        except Exception as e:
-            st.error(f"Error processing GeoJSON data: {e}")
-            return None
-    else:
-        return None
-
-# Add custom CSS
-add_custom_css()
-
-# Title and Sidebar
-st.markdown('<div class="title">Food Desert Analysis in Brooklyn</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<div class="sidebar">Navigation</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<div class="sidebar">Choose a page:</div>', unsafe_allow_html=True)
-
-# Page Selection
-page = st.sidebar.selectbox("Select Page", ["Home", "Data Visualization", "Comments", "Help"])
-
-# Home Page
-if page == "Home":
-    st.markdown('<div class="header">Welcome to the Food Desert Analysis App</div>', unsafe_allow_html=True)
-    st.markdown('<div class="text">This app helps to analyze food desert regions in Brooklyn.</div>', unsafe_allow_html=True)
-
-# Data Visualization Page
-elif page == "Data Visualization":
-    st.markdown('<div class="header">Data Visualization</div>', unsafe_allow_html=True)
-    st.markdown('<div class="text">Visualize different aspects of food deserts in Brooklyn.</div>', unsafe_allow_html=True)
+    elif map_option == "Supermarket Coverage Ratio":
+        # Placeholder for Supermarket Coverage Ratio functionality
+        st.write("Supermarket Coverage Ratio functionality to be added.")
     
-    # Select map type
-    map_type = st.sidebar.radio("Select from any 3 Maps", ["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
-    
-    # Show year selection for all map types
-    year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
+    elif map_option == "Fast Food Coverage Ratio":
+        # Placeholder for Fast Food Coverage Ratio functionality
+        st.write("Fast Food Coverage Ratio functionality to be added.")
 
-    # Load data
-    if map_type == "LILA & Non-LILA Zones":
-        try:
-            data = pd.read_csv('LILAZones_geo.csv')
-            st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
-        except Exception as e:
-            st.error(f"Error loading LILA Zones data: {e}")
-            data = pd.DataFrame()
-    else:
-        data = pd.DataFrame({
-            'lat': [40.6782, 40.6792, 40.6802],
-            'lon': [-73.9442, -73.9452, -73.9462],
-            'popup_info': ['Info 1', 'Info 2', 'Info 3'],
-            'Year': [2015, 2016, 2017]
-        })
-
-    # Create and display map
-    if not data.empty:
-        m = create_map(data, map_type, year)
-        st_folium(m, width=700, height=500)
-
-    # Search functionality for all map types
-    search_query = st.sidebar.text_input("Search for Census Tract Area:")
-    if st.sidebar.button("Search"):
-        search_map = search_census_tract(data, search_query)
-        if search_map:
-            st_folium(search_map, width=700, height=500)
-        else:
-            st.sidebar.error("Census Tract Area not found.")
-
-    # Download Options
-    if st.sidebar.button("Download Data as CSV"):
-        if not data.empty:
-            csv = data.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()
-            href = f'<a href="data:file/csv;base64,{b64}" download="food_desert_data.csv">Download CSV File</a>'
-            st.sidebar.markdown(href, unsafe_allow_html=True)
-        else:
-            st.sidebar.error("No data available to download.")
-
-    # Sharing Feature
-    if st.sidebar.button("Share App"):
-        st.sidebar.markdown("Share this app using the link: [App Link](http://example.com)")
-
-# Comments Page
-elif page == "Comments":
-    st.markdown('<div class="header">Comments</div>', unsafe_allow_html=True)
-    st.text_area("Leave your comments here:")
-
-# Help Page
-elif page == "Help":
-    st.markdown('<div class="header">Help and Tutorial</div>', unsafe_allow_html=True)
-    st.markdown('<div class="text">How to effectively use the app:</div>', unsafe_allow_html=True)
-    st.markdown('1. Use the sidebar to select different map types and years.')
-    st.markdown('2. Hover over areas to see detailed information.')
-    st.markdown('3. Click on areas to see more details or navigate to other sections.')
-
-# Display main map on the page
-if page == "Home" or page == "Data Visualization":
-    st.markdown('<div class="text">Select from the sidebar to visualize different data sets.</div>', unsafe_allow_html=True)
+if __name__ == "__main__":
+    main()
