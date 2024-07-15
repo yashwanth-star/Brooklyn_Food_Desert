@@ -106,7 +106,7 @@ def main():
 
             # Add a beautified share button
             st.sidebar.markdown("## Share App")
-            shareable_link = "http://example.com"  # Replace with your app's link
+            shareable_link = "https://samplefooddesert01.streamlit.app/"
             share_button_html = f"""
             <a href="{shareable_link}" target="_blank">
                 <button style="
