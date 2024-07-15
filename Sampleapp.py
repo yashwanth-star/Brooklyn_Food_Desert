@@ -18,7 +18,7 @@ def load_data():
 # Main function to create the app
 def main():
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Home", "Data Visualization", "Comments", "Data Analysis", "Guide"])
+    page = st.sidebar.selectbox("Go to", ["Home", "Data Visualization", "Comments", "Data Analysis", "Guide"])
 
     if page == "Home":
         st.title("Welcome to the Food Desert Analysis App")
