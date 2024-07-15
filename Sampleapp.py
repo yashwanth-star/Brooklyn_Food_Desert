@@ -41,8 +41,8 @@ def main():
             
             if search_query != "All":
                 filtered_gdf = gdf[gdf['NTA Name'] == search_query]
-                details = filtered_gdf[['NTA Name', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                for i, row in details.iterrows():
+                if not filtered_gdf.empty:
+                    row = filtered_gdf.iloc[0]
                     st.subheader(f"Details for {row['NTA Name']}")
                     st.write(f"**Food Index:** {row['Food Index']}")
                     st.write(f"**Median Family Income:** {row[' Median Family Income ']}")
