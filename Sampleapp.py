@@ -4,6 +4,7 @@ import folium
 from streamlit_folium import st_folium
 import base64
 import json
+from shapely import wkt
 
 # Function to add custom CSS for styling
 def add_custom_css():
@@ -34,18 +35,13 @@ def create_map(data, map_type, year=None):
     m = folium.Map(location=[40.6782, -73.9442], zoom_start=12)  # Centered on Brooklyn
     if map_type == "LILA & Non-LILA Zones":
         folium.TileLayer('Stamen Toner').add_to(m)
-        for _, row in data.iterrows():
-            try:
-                geojson_data = row['geometry']
-                folium.GeoJson(geojson_data).add_to(m)
-            except Exception as e:
-                st.error(f"Error processing GeoJSON data: {e}")
-    else:
+    elif map_type == "Supermarket Coverage Ratio" or map_type == "Fast Food Coverage Ratio":
         if year:
             # Filter data based on the selected year
             filtered_data = data[data['Year'] == year]
             for _, row in filtered_data.iterrows():
-                folium.Marker(location=[row['lat'], row['lon']], popup=row['popup_info']).add_to(m)
+                geometry = wkt.loads(row['geometry'])
+                folium.GeoJson(geometry.__geo_interface__).add_to(m)
     return m
 
 # Add custom CSS
@@ -74,36 +70,22 @@ elif page == "Data Visualization":
     
     # Show year selection for "Supermarket Coverage Ratio" and "Fast Food Coverage Ratio"
     if map_type != "LILA & Non-LILA Zones":
-        year = st.sidebar.radio("Food Policies", [2015, 2016, 2017, 2023])
+        year = st.sidebar.radio("Food Policies", [2003, 2015, 2016, 2017, 2023])
     else:
         year = None
     
     # Load data
-    if map_type == "LILA & Non-LILA Zones":
-        try:
-            data = pd.read_csv('LILAZones_geo.csv')
-            st.markdown('<div class="text">LILA Zones data loaded successfully!</div>', unsafe_allow_html=True)
-            # Load geometry data from JSON file
-            with open('LILAZones_geo_corrected_new.json', 'r') as f:
-                geojson_data = json.load(f)
-            data['geometry'] = data['Census Tract Area'].map(geojson_data)
-        except Exception as e:
-            st.error(f"Error loading LILA Zones data: {e}")
-            data = pd.DataFrame()
-    elif map_type == "Supermarket Coverage Ratio":
-        try:
+    try:
+        if map_type == "Supermarket Coverage Ratio":
             data = pd.read_csv('supermarkets.csv')
-            st.markdown('<div class="text">Supermarket Coverage Ratio data loaded successfully!</div>', unsafe_allow_html=True)
-        except Exception as e:
-            st.error(f"Error loading Supermarket Coverage Ratio data: {e}")
-            data = pd.DataFrame()
-    elif map_type == "Fast Food Coverage Ratio":
-        try:
-            data = pd.read_csv('fast_food.csv')
-            st.markdown('<div class="text">Fast Food Coverage Ratio data loaded successfully!</div>', unsafe_allow_html=True)
-        except Exception as e:
-            st.error(f"Error loading Fast Food Coverage Ratio data: {e}")
-            data = pd.DataFrame()
+        elif map_type == "Fast Food Coverage Ratio":
+            data = pd.read_csv('fastfood.csv')
+        else:
+            data = pd.read_csv('LILAZones_geo.csv')
+        st.markdown('<div class="text">Data loaded successfully!</div>', unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        data = pd.DataFrame()
 
     # Create and display map
     if not data.empty:
