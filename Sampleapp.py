@@ -67,7 +67,7 @@ def create_supermarket_map(year, selected_rank=None):
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
         tooltip=folium.GeoJsonTooltip(
-            fields=['GEOID', year_column, rank_column],
+            fields=[CensusTract, year_column, rank_column],
             aliases=['Census Tract Area', f'{year}', 'Rank'],
             localize=True
         )
@@ -112,7 +112,7 @@ def create_fast_food_map(year, selected_rank=None):
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
         tooltip=folium.GeoJsonTooltip(
-            fields=['GEOID', year_column, rank_column],
+            fields=[CensusTract, year_column, rank_column],
             aliases=['Census Tract Area', f'{year}', 'Rank'],
             localize=True
         )
