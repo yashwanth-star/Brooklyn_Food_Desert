@@ -2,65 +2,54 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import folium
-from streamlit_folium import st_folium, folium_static
+from streamlit_folium import folium_static
 from shapely import wkt
 import base64
 
 # Cache the data loading and processing function
 @st.cache_data
-def load_data():
-    data = pd.read_csv('LILAZones_geo.csv')
+def load_data(file_path):
+    data = pd.read_csv(file_path)
     data['geometry'] = data['geometry'].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(data, geometry='geometry')
     gdf.set_crs(epsg=4326, inplace=True)  # Set CRS to WGS84
     return gdf
 
-# Cache the data loading and processing function for supermarkets
-@st.cache_resource
-def load_and_process_data(data_path):
-    data = pd.read_csv(data_path)
-    data['geometry'] = data['geometry'].apply(wkt.loads)
-    gdf = gpd.GeoDataFrame(data, geometry='geometry')
-    gdf.set_crs(epsg=4326, inplace=True)
-    return gdf
+# Load and process the data
+lila_data_path = 'LILAZones_geo.csv'
+gdf_lila = load_data(lila_data_path)
 
-# Load and process the data for supermarkets
 supermarket_data_path = "supermarkets.csv"
-gdf_supermarkets = load_and_process_data(supermarket_data_path)
+gdf_supermarkets = load_data(supermarket_data_path)
 
-# Load and process the data for fast food
 fast_food_data_path = "Fast Food Restaurants.csv"
-gdf_fast_food = load_and_process_data(fast_food_data_path)
+gdf_fast_food = load_data(fast_food_data_path)
 
-# Function to create a folium map for a given year and optionally filter by rank for supermarkets
-def create_supermarket_map(year, selected_rank=None):
+# Function to create a folium map for a given year and optionally filter by rank
+def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, legend_name="Coverage Ratio"):
     # Create a base map
     m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Centered around New York
     
-    # Add data to the map
-    year_column = f'{year}_supermarket coverage ratio'
-    rank_column = f'{year}_rank'
-    
     # Check if columns exist
-    if year_column not in gdf_supermarkets.columns or rank_column not in gdf_supermarkets.columns:
-        st.error(f"Column '{year_column}' or '{rank_column}' does not exist in the data.")
+    if coverage_ratio_col not in gdf.columns or rank_col not in gdf.columns:
+        st.error(f"Column '{coverage_ratio_col}' or '{rank_col}' does not exist in the data.")
         return m
     
     # Filter GeoDataFrame if a specific rank is selected
-    gdf_filtered = gdf_supermarkets.copy()
+    gdf_filtered = gdf.copy()
     if selected_rank and selected_rank != 'All':
-        gdf_filtered = gdf_filtered[gdf_filtered[rank_column] == selected_rank]
+        gdf_filtered = gdf_filtered[gdf_filtered[rank_col] == selected_rank]
     
     folium.Choropleth(
         geo_data=gdf_filtered,
         name='choropleth',
         data=gdf_filtered,
-        columns=['TRACTCE', year_column],
+        columns=['TRACTCE', coverage_ratio_col],
         key_on='feature.properties.TRACTCE',
         fill_color='YlOrRd',
         fill_opacity=0.7,
         line_opacity=0.2,
-        legend_name='Supermarket Coverage Ratio'
+        legend_name=legend_name
     ).add_to(m)
     
     # Add tooltips
@@ -68,53 +57,8 @@ def create_supermarket_map(year, selected_rank=None):
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
         tooltip=folium.GeoJsonTooltip(
-            fields=['TRACTCE', year_column, rank_column],
-            aliases=['Census Tract Area', f'{year} Supermarket Coverage Ratio', 'Rank'],
-            localize=True
-        )
-    ).add_to(m)
-    
-    folium.LayerControl().add_to(m)
-    return m
-
-# Function to create a folium map for a given year and optionally filter by rank for fast food
-def create_fast_food_map(year, selected_rank=None):
-    # Create a base map
-    m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Centered around New York
-    
-    # Add data to the map
-    year_column = f'{year}_Fast Food Coverage Ratio'
-    rank_column = f'{year}_rank'
-    
-    # Check if columns exist
-    if year_column not in gdf_fast_food.columns or rank_column not in gdf_fast_food.columns:
-        st.error(f"Column '{year_column}' or '{rank_column}' does not exist in the data.")
-        return m
-    
-    # Filter GeoDataFrame if a specific rank is selected
-    gdf_filtered = gdf_fast_food.copy()
-    if selected_rank and selected_rank != 'All':
-        gdf_filtered = gdf_filtered[gdf_filtered[rank_column] == selected_rank]
-    
-    folium.Choropleth(
-        geo_data=gdf_filtered,
-        name='choropleth',
-        data=gdf_filtered,
-        columns=['TRACTCE', year_column],
-        key_on='feature.properties.TRACTCE',
-        fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        legend_name='Fast Food Restaurant Coverage Ratio'
-    ).add_to(m)
-    
-    # Add tooltips
-    folium.GeoJson(
-        gdf_filtered,
-        style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
-        tooltip=folium.GeoJsonTooltip(
-            fields=['TRACTCE', year_column, rank_column],
-            aliases=['Census Tract Area', f'{year} Fast Food Coverage Ratio', 'Rank'],
+            fields=['TRACTCE', coverage_ratio_col, rank_col],
+            aliases=['Census Tract Area', f'{year} {legend_name}', 'Rank'],
             localize=True
         )
     ).add_to(m)
@@ -166,24 +110,23 @@ def main():
 
         with tabs[0]:
             st.header("LILA & Non-LILA Zones")
-            gdf = load_data()
-
+            
             search_query_nta = st.selectbox(
                 "Search for NTA Name:",
-                options=["All"] + gdf['NTA Name'].unique().tolist()
+                options=["All"] + gdf_lila['NTA Name'].unique().tolist()
             )
 
             search_query_tract = st.selectbox(
                 "Search for Census Tract Area:",
-                options=["All"] + (gdf[gdf['NTA Name'] == search_query_nta]['Census Tract Area'].unique().tolist() if search_query_nta != "All" else gdf['Census Tract Area'].unique().tolist())
+                options=["All"] + (gdf_lila[gdf_lila['NTA Name'] == search_query_nta]['Census Tract Area'].unique().tolist() if search_query_nta != "All" else gdf_lila['Census Tract Area'].unique().tolist())
             )
 
             if search_query_nta != "All" and search_query_tract != "All":
-                filtered_gdf = gdf[(gdf['NTA Name'] == search_query_nta) & (gdf['Census Tract Area'] == search_query_tract)]
+                filtered_gdf = gdf_lila[(gdf_lila['NTA Name'] == search_query_nta) & (gdf_lila['Census Tract Area'] == search_query_tract)]
             elif search_query_nta != "All":
-                filtered_gdf = gdf[gdf['NTA Name'] == search_query_nta]
+                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == search_query_nta]
             else:
-                filtered_gdf = gdf
+                filtered_gdf = gdf_lila
 
             m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)
             folium.GeoJson(
@@ -200,7 +143,7 @@ def main():
                     localize=True
                 )
             ).add_to(m)
-            st_folium(m, width=800, height=600)
+            folium_static(m, width=800, height=600)
 
             def display_info(details):
                 for i, row in details.iterrows():
@@ -241,7 +184,7 @@ def main():
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
 
             # Create and display the map
-            m = create_supermarket_map(year, selected_rank)
+            m = create_map(gdf_supermarkets, year, f'{year}_supermarket coverage ratio', f'{year}_rank', selected_rank, "Supermarket Coverage Ratio")
             folium_static(m)
 
             # Display the tooltip information below the map if a specific rank is selected
@@ -267,7 +210,7 @@ def main():
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
 
             # Create and display the map
-            m = create_fast_food_map(year, selected_rank)
+            m = create_map(gdf_fast_food, year, f'{year}_Fast Food Coverage Ratio', f'{year}_rank', selected_rank, "Fast Food Coverage Ratio")
             folium_static(m)
 
             # Display the tooltip information below the map if a specific rank is selected
@@ -282,7 +225,7 @@ def main():
         st.sidebar.markdown(f'<a href="{mailto_link}" target="_blank"><button style="background-color:green;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Share App via Email</button></a>', unsafe_allow_html=True)
 
         # Download CSV button
-        csv = gdf.to_csv(index=False)
+        csv = gdf_lila.to_csv(index=False)
         b64 = base64.b64encode(csv.encode()).decode()
         href = f'<a href="data:file/csv;base64,{b64}" download="LILAZones_geo.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
         st.sidebar.markdown(href, unsafe_allow_html=True)
