@@ -19,8 +19,7 @@ def load_data():
 @st.cache_resource
 def load_and_process_data(data_path):
     data = pd.read_csv(data_path)
-    data['geometry'] = data['geometry'].apply(wkt.loads)
-    gdf = gpd.GeoDataFrame(data, geometry='geometry')
+    gdf = gpd.GeoDataFrame(data, geometry=gpd.GeoSeries.from_wkt(data['geometry']))
     gdf.set_crs(epsg=4326, inplace=True)
     return gdf
 
@@ -55,8 +54,8 @@ def create_supermarket_map(year, selected_rank=None):
         geo_data=gdf_filtered,
         name='choropleth',
         data=gdf_filtered,
-        columns=['TRACTCE', year_column],
-        key_on='feature.properties.TRACTCE',
+        columns=['GEOID', year_column],
+        key_on='feature.properties.GEOID',
         fill_color='YlOrRd',
         fill_opacity=0.7,
         line_opacity=0.2,
@@ -100,8 +99,8 @@ def create_fast_food_map(year, selected_rank=None):
         geo_data=gdf_filtered,
         name='choropleth',
         data=gdf_filtered,
-        columns=['TRACTCE', year_column],
-        key_on='feature.properties.TRACTCE',
+        columns=['GEOID', year_column],
+        key_on='feature.properties.GEOID',
         fill_color='YlOrRd',
         fill_opacity=0.7,
         line_opacity=0.2,
@@ -189,110 +188,4 @@ def main():
             folium.GeoJson(
                 filtered_gdf,
                 style_function=lambda feature: {
-                    'fillColor': 'red',
-                    'color': 'red',
-                    'weight': 1,
-                    'fillOpacity': 0.6,
-                },
-                tooltip=folium.GeoJsonTooltip(
-                    fields=['Census Tract Area', 'NTA Name', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %'],
-                    aliases=['Census Tract Area:', 'NTA Name:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
-                    localize=True
-                )
-            ).add_to(m)
-            st_folium(m, width=800, height=600)
-
-            def display_info(details):
-                for i, row in details.iterrows():
-                    st.markdown(f"""
-                        <div style="border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 20px 0; background-color: #f9f9f9;">
-                            <h4 style="color: #2E8B57;">{row['NTA Name']} - Census Tract Area: {row['Census Tract Area']}</h4>
-                            <p><strong style="color: #FF6347;">Food Index:</strong> {row['Food Index']}</p>
-                            <p><strong style="color: #4682B4;">Median Family Income:</strong> {row[' Median Family Income ']}</p>
-                            <p><strong style="color: #8A2BE2;">Poverty Rate:</strong> {row['Education below high school diploma (Poverty Rate)']}</p>
-                            <p><strong style="color: #DAA520;">SNAP Benefits:</strong> {row['SNAP Benefits %']}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
-
-            if search_query_nta != "All":
-                if search_query_tract == "All":
-                    details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                    st.subheader(f"Details for {search_query_nta}")
-                    display_info(details)
-                else:
-                    details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                    display_info(details)
-
-        with tabs[1]:
-            st.header("Supermarket Coverage Ratio")
-            
-            # Add a select slider for the years
-            years = list(range(2003, 2018))  # Adjust this range based on your data
-            year = st.select_slider(
-                "Select Year",
-                options=years,
-                value=min(years),
-                format_func=lambda x: f"{x}",
-                key="supermarket_year_slider"
-            )
-
-            # Add a select box for Rank search
-            rank_options = ['All'] + sorted(gdf_supermarkets[f'{year}_rank'].dropna().unique().tolist())
-            selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
-
-            # Create and display the map
-            m = create_supermarket_map(year, selected_rank)
-            folium_static(m)
-
-            # Display the tooltip information below the map if a specific rank is selected
-            if selected_rank != 'All':
-                filtered_gdf = gdf_supermarkets[gdf_supermarkets[f'{year}_rank'] == selected_rank]
-                display_tooltip_info(filtered_gdf, year, f'{year}_supermarket coverage ratio')
-
-        with tabs[2]:
-            st.header("Fast Food Coverage Ratio")
-            
-            # Add a select slider for the years
-            years = list(range(2003, 2018))  # Adjust this range based on your data
-            year = st.select_slider(
-                "Select Year",
-                options=years,
-                value=min(years),
-                format_func=lambda x: f"{x}",
-                key="fast_food_year_slider"
-            )
-
-            # Add a select box for Rank search
-            rank_options = ['All'] + sorted(gdf_fast_food[f'{year}_rank'].dropna().unique().tolist())
-            selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
-
-            # Create and display the map
-            m = create_fast_food_map(year, selected_rank)
-            folium_static(m)
-
-            # Display the tooltip information below the map if a specific rank is selected
-            if selected_rank != 'All':
-                filtered_gdf = gdf_fast_food[gdf_fast_food[f'{year}_rank'] == selected_rank]
-                display_tooltip_info(filtered_gdf, year, f'{year}_Fast Food Coverage Ratio')
-
-        # Share App button with Gmail link
-        share_text = "Check out this Food Desert Analysis App!"
-        app_link = "https://samplefooddesert01.streamlit.app/"
-        mailto_link = f"mailto:?subject=Food Desert Analysis App&body={share_text}%0A{app_link}"
-        st.sidebar.markdown(f'<a href="{mailto_link}" target="_blank"><button style="background-color:green;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Share App via Email</button></a>', unsafe_allow_html=True)
-
-        # Download CSV button
-        csv = gdf.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="LILAZones_geo.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
-        st.sidebar.markdown(href, unsafe_allow_html=True)
-
-    elif selection == "Comments":
-        st.write("Leave your comments here:")
-        st.text_area("Comments:")
-
-    elif selection == "Guide":
-        st.write("How to use the app content goes here.")
-
-if __name__ == "__main__":
-    main()
+                    'fillColor': 'red
