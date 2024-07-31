@@ -19,7 +19,8 @@ def load_data():
 @st.cache_resource
 def load_and_process_data(data_path):
     data = pd.read_csv(data_path)
-    gdf = gpd.GeoDataFrame(data, geometry=gpd.GeoSeries.from_wkt(data['geometry']))
+    data['geometry'] = data['geometry'].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(data, geometry='geometry')
     gdf.set_crs(epsg=4326, inplace=True)
     return gdf
 
@@ -54,8 +55,8 @@ def create_supermarket_map(year, selected_rank=None):
         geo_data=gdf_filtered,
         name='choropleth',
         data=gdf_filtered,
-        columns=['GEOID', year_column],
-        key_on='feature.properties.GEOID',
+        columns=['TRACTCE', year_column],
+        key_on='feature.properties.TRACTCE',
         fill_color='YlOrRd',
         fill_opacity=0.7,
         line_opacity=0.2,
@@ -99,8 +100,8 @@ def create_fast_food_map(year, selected_rank=None):
         geo_data=gdf_filtered,
         name='choropleth',
         data=gdf_filtered,
-        columns=['GEOID', year_column],
-        key_on='feature.properties.GEOID',
+        columns=['TRACTCE', year_column],
+        key_on='feature.properties.TRACTCE',
         fill_color='YlOrRd',
         fill_opacity=0.7,
         line_opacity=0.2,
