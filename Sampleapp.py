@@ -67,8 +67,8 @@ def create_supermarket_map(year, selected_rank=None):
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
         tooltip=folium.GeoJsonTooltip(
-            fields=[CensusTract, year_column, rank_column],
-            aliases=['Census Tract Area', f'{year}', 'Rank'],
+            fields=['TRACTCE', year_column, rank_column],
+            aliases=['Census Tract Area', f'{year} Supermarket Coverage Ratio', 'Rank'],
             localize=True
         )
     ).add_to(m)
@@ -112,8 +112,8 @@ def create_fast_food_map(year, selected_rank=None):
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
         tooltip=folium.GeoJsonTooltip(
-            fields=[CensusTract, year_column, rank_column],
-            aliases=['Census Tract Area', f'{year}', 'Rank'],
+            fields=['TRACTCE', year_column, rank_column],
+            aliases=['Census Tract Area', f'{year} Fast Food Coverage Ratio', 'Rank'],
             localize=True
         )
     ).add_to(m)
@@ -128,7 +128,7 @@ def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
             st.markdown(
                 f"""
                 <div style="border:1px solid #ddd; border-radius: 10px; padding: 10px; margin: 10px 0; background-color: #f9f9f9;">
-                    <h4 style="color: #2E7D32;">Census Tract Area: {row['GEOID']}</h4>
+                    <h4 style="color: #2E7D32;">Census Tract Area: {row['TRACTCE']}</h4>
                     <p><span style="color: #D32F2F;">{year}: </span>{row[coverage_ratio_col]}</p>
                     <p><span style="color: #1976D2;">Rank: </span>{row[f'{year}_rank']}</p>
                 </div>
