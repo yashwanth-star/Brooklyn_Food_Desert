@@ -181,7 +181,7 @@ def main():
 
             # Add a select box for Rank search
             rank_options = ['All'] + sorted(gdf_supermarkets[f'{year}_rank'].dropna().unique().tolist())
-            selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", sorted(rank_options), key="supermarket_rank_select")
+            selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
 
             # Create and display the map
             m = create_map(gdf_supermarkets, year, f'{year}_supermarket coverage ratio', f'{year}_rank', selected_rank, "Supermarket Coverage Ratio")
@@ -207,7 +207,7 @@ def main():
 
             # Add a select box for Rank search
             rank_options = ['All'] + sorted(gdf_fast_food[f'{year}_rank'].dropna().unique().tolist())
-            selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", sorted(rank_options), key="fast_food_rank_select")
+            selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
 
             # Create and display the map
             m = create_map(gdf_fast_food, year, f'{year}_Fast Food Coverage Ratio', f'{year}_rank', selected_rank, "Fast Food Coverage Ratio")
