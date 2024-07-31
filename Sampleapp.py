@@ -6,6 +6,11 @@ from streamlit_folium import st_folium, folium_static
 from shapely import wkt
 import base64
 
+# Clear the cache
+@st.cache_data.clear()
+def clear_cache():
+    st.cache_data.clear()
+
 # Cache the data loading and processing function
 @st.cache_data
 def load_data():
