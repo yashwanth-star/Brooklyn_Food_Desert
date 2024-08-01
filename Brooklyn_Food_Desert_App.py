@@ -4,6 +4,8 @@ import geopandas as gpd
 import folium
 from streamlit_folium import folium_static
 from shapely import wkt
+import plotly.express as px
+import plotly.figure_factory as ff
 import base64
 
 # Cache the data loading and processing function
@@ -102,7 +104,75 @@ def main():
         st.write("This app helps to analyze food desert regions in Brooklyn.")
     
     elif selection == "Data Analysis":
-        st.write("Data analysis content goes here.")
+        # Load the datasets for analysis
+        socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
+        convStores_df = pd.read_csv('dataset_convStores.csv')
+        eating_df = pd.read_csv('dataset_eating.csv')
+        corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
+
+        # Interactive Data Analysis Page
+        st.title("Interactive Data Analysis Page")
+
+        # 1. Family Income vs Race (2016-2020)
+        st.header("Family Income vs Race (2016-2020)")
+        races = socioeconomics_df.columns
+        selected_races = st.multiselect('Select races to display', races, default=races)
+        filtered_income_df = socioeconomics_df[selected_races]
+        fig1 = px.box(filtered_income_df, 
+                     labels={'value': 'Family Income', 'variable': 'Race'},
+                     title='Family Income vs Race (2016-2020)')
+        st.plotly_chart(fig1)
+        st.markdown("""
+        #### Explanation:
+        This boxplot visualizes the distribution of family incomes across different racial groups between 2016 and 2020. Each box represents the interquartile range (IQR), showing the median and spread of the data. The whiskers indicate variability outside the upper and lower quartiles, while points beyond the whiskers are outliers. This visualization helps in identifying income disparities among various racial groups.
+        """)
+
+        # 2. Employment in Convenience Stores Over Time
+        st.header("Employment in Convenience Stores Over Time")
+        years = convStores_df['year'].unique()
+        selected_years = st.slider('Select years', min_value=int(years.min()), max_value=int(years.max()), value=(int(years.min()), int(years.max())))
+        filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years[0]) & (convStores_df['year'] <= selected_years[1])]
+        fig2 = px.line(filtered_convStores_df, x='year', y=['count_emp_4453', 'count_emp_453991', 'count_emp_445120'],
+                      labels={'value': 'Employment Count', 'year': 'Year'},
+                      title='Employment in Convenience Stores Over Time')
+        st.plotly_chart(fig2)
+        st.markdown("""
+        #### Explanation:
+        This line chart illustrates the trends in employment across different types of stores, including convenience stores, other general stores, and grocery stores over several years. The x-axis represents the years, while the y-axis represents the count of employees. The lines demonstrate how employment levels have changed over time, helping to identify growth or decline trends in these sectors.
+        """)
+
+        # 3. Employment in Eating Establishments Over Time
+        st.header("Employment in Eating Establishments Over Time")
+        years = eating_df['year'].unique()
+        selected_years = st.slider('Select years', min_value=int(years.min()), max_value=int(years.max()), value=(int(years.min()), int(years.max())))
+        filtered_eating_df = eating_df[(eating_df['year'] >= selected_years[0]) & (eating_df['year'] <= selected_years[1])]
+        fig3 = px.line(filtered_eating_df, x='year', y=['count_emp_722511', 'count_emp_722513', 'count_emp_722515', 'count_emp_722410'],
+                      labels={'value': 'Employment Count', 'year': 'Year'},
+                      title='Employment in Eating Establishments Over Time')
+        st.plotly_chart(fig3)
+        st.markdown("""
+        #### Explanation:
+        This line chart displays employment trends in various eating establishments, such as full-service restaurants, limited-service restaurants, snack and nonalcoholic beverage bars, and caterers over time. The x-axis denotes the years, and the y-axis indicates the count of employees. This plot helps in understanding how employment in different types of eating establishments has evolved, highlighting periods of growth or decline.
+        """)
+
+        # 4. Correlation Heatmap
+        st.header("Correlation Heatmap")
+        columns = corrPlot_df.columns
+        selected_columns = st.multiselect('Select columns for correlation', columns, default=columns)
+        filtered_corr_df = corrPlot_df[selected_columns]
+        corr = filtered_corr_df.corr()
+        fig4 = ff.create_annotated_heatmap(
+            z=corr.values,
+            x=list(corr.columns),
+            y=list(corr.index),
+            annotation_text=corr.round(2).values,
+            colorscale='Viridis'
+        )
+        st.plotly_chart(fig4)
+        st.markdown("""
+        #### Explanation:
+        This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
+        """)
 
     elif selection == "Data Visualization":
         # Map selection using tabs
