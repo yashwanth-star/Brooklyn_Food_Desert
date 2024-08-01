@@ -116,13 +116,16 @@ def main():
                 options=["All"] + gdf_lila['NTA Name'].unique().tolist()
             )
 
+            filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == search_query_nta] if search_query_nta != "All" else gdf_lila
+
             search_query_tract = st.selectbox(
                 "Search for Census Tract Area:",
-                options=["All"] + (gdf_lila[gdf_lila['NTA Name'] == search_query_nta]['Census Tract Area'].unique().tolist() if search_query_nta != "All" else gdf_lila['Census Tract Area'].unique().tolist())
+                options=["All"] + filtered_gdf['Census Tract Area'].unique().tolist()
             )
 
-            if search_query_nta != "All" and search_query_tract != "All":
-                filtered_gdf = gdf_lila[(gdf_lila['NTA Name'] == search_query_nta) & (gdf_lila['Census Tract Area'] == search_query_tract)]
+            if search_query_tract != "All":
+                filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == search_query_tract]
+
             elif search_query_nta != "All":
                 filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == search_query_nta]
             else:
