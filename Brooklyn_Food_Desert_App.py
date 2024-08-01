@@ -130,7 +130,7 @@ def main():
                 filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == tract_selected]
                 # Ensure NTA dropdown is updated according to selected Census Tract Area
                 nta_options = ["All"] + filtered_gdf['NTA Name'].unique().tolist()
-                nta_selected = st.selectbox("Search for NTA Name:", nta_options, index=1 if nta_selected == "All" else 0)
+                nta_selected = nta_options[1] if nta_selected == "All" else nta_selected
             elif nta_selected != "All":
                 filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
             else:
