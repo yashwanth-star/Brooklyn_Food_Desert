@@ -110,34 +110,29 @@ def main():
 
         with tabs[0]:
             st.header("LILA & Non-LILA Zones")
-            
-            search_query_nta = st.selectbox(
-                "Search for NTA Name:",
-                options=["All"] + gdf_lila['NTA Name'].unique().tolist()
-            )
+
+            # Initial filter
+            nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
+            nta_selected = st.selectbox("Search for NTA Name:", nta_options)
 
             # Filter the GeoDataFrame based on the selected NTA Name
-            if search_query_nta != "All":
-                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == search_query_nta]
+            if nta_selected != "All":
+                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
             else:
                 filtered_gdf = gdf_lila
 
-            search_query_tract = st.selectbox(
-                "Search for Census Tract Area:",
-                options=["All"] + filtered_gdf['Census Tract Area'].unique().tolist()
-            )
+            # Census Tract Area filter based on the filtered GeoDataFrame
+            tract_options = ["All"] + filtered_gdf['Census Tract Area'].unique().tolist()
+            tract_selected = st.selectbox("Search for Census Tract Area:", tract_options)
 
             # Update the filtering logic to highlight the selected Census Tract Area
-            if search_query_tract != "All":
-                filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == search_query_tract]
+            if tract_selected != "All":
+                filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == tract_selected]
                 # Ensure NTA dropdown is updated according to selected Census Tract Area
-                search_query_nta = st.selectbox(
-                    "Search for NTA Name:",
-                    options=["All"] + filtered_gdf['NTA Name'].unique().tolist(),
-                    index=1 if search_query_nta == "All" else 0
-                )
-            elif search_query_nta != "All":
-                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == search_query_nta]
+                nta_options = ["All"] + filtered_gdf['NTA Name'].unique().tolist()
+                nta_selected = st.selectbox("Search for NTA Name:", nta_options, index=1 if nta_selected == "All" else 0)
+            elif nta_selected != "All":
+                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
             else:
                 filtered_gdf = gdf_lila
 
@@ -170,10 +165,10 @@ def main():
                         </div>
                     """, unsafe_allow_html=True)
 
-            if search_query_nta != "All":
-                if search_query_tract == "All":
+            if nta_selected != "All":
+                if tract_selected == "All":
                     details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                    st.subheader(f"Details for {search_query_nta}")
+                    st.subheader(f"Details for {nta_selected}")
                     display_info(details)
                 else:
                     details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
