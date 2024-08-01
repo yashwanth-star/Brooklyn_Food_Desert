@@ -7,6 +7,7 @@ from shapely import wkt
 import plotly.express as px
 import plotly.figure_factory as ff
 import base64
+import plotly
 
 # Cache the data loading and processing function
 @st.cache_data
