@@ -357,6 +357,10 @@ def main():
                 else:
                     details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
                     display_info(details)
+            elif search_query_tract != "All":
+                details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
+                st.subheader(f"Details for Census Tract Area {search_query_tract}")
+                display_info(details)
 
         with tabs[1]:
             st.header("Supermarket Coverage Ratio")
@@ -372,7 +376,7 @@ def main():
             )
 
             # Add a select box for Rank search
-            rank_options = ['All'] + sorted(set([rank for rank in gdf_supermarkets[f'{year}_rank'] if pd.notna(rank)]), key=lambda x: (isinstance(x, str), x))
+            rank_options = ['All'] + sorted(set([rank for rank in gdf_supermarkets[f'{year}_rank'] if pd.notna(rank)]), key=lambda x: int(x) if x.isdigit() else x)
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
 
             # Create and display the map
@@ -398,7 +402,7 @@ def main():
             )
 
             # Add a select box for Rank search
-            rank_options = ['All'] + sorted(set([rank for rank in gdf_fast_food[f'{year}_rank'] if pd.notna(rank)]), key=lambda x: (isinstance(x, str), x))
+            rank_options = ['All'] + sorted(set([rank for rank in gdf_fast_food[f'{year}_rank'] if pd.notna(rank)]), key=lambda x: int(x) if x.isdigit() else x)
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
 
             # Create and display the map
