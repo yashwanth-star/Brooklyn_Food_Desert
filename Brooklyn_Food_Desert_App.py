@@ -47,14 +47,7 @@ column_mapping = {
     'MEDFAMINC16_20': 'All',
     'MEDFAMINC_NHWHITE16_20': 'White',
     'MEDFAMINC_BLACK16_20': 'Black',
-    'MEDFAMINC_HISPANIC16_20': 'Hispanic',
-    'count_emp_4453': 'Alcohol',
-    'count_emp_453991': 'Cigarettes',
-    'count_emp_445120': 'Food stores',
-    'count_emp_722511': 'Restaurants',
-    'count_emp_722513': 'Fast-foods',
-    'count_emp_722515': 'Snack places',
-    'count_emp_722410': 'Drinking places'
+    'MEDFAMINC_HISPANIC16_20': 'Hispanic'
 }
 
 # Function to create a folium map
@@ -167,11 +160,8 @@ def main():
         # Filter the dataframe
         filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
 
-        # Rename columns for display
-        filtered_convStores_df = filtered_convStores_df.rename(columns=column_mapping)
-
         # Create the plot
-        fig2 = px.line(filtered_convStores_df, x='year', y=['Alcohol', 'Cigarettes', 'Food stores'],
+        fig2 = px.line(filtered_convStores_df, x='year', y=['count_emp_4453', 'count_emp_453991', 'count_emp_445120'],
                     labels={'value': 'Employment Count', 'year': 'Year'},
                     title='Employment in Convenience Stores Over Time')
 
@@ -194,11 +184,8 @@ def main():
         # Filter the dataframe
         filtered_eating_df = eating_df[(eating_df['year'] >= selected_years_eating[0]) & (eating_df['year'] <= selected_years_eating[1])]
 
-        # Rename columns for display
-        filtered_eating_df = filtered_eating_df.rename(columns=column_mapping)
-
         # Create the plot
-        fig3 = px.line(filtered_eating_df, x='year', y=['Restaurants', 'Fast-foods', 'Snack places', 'Drinking places'],
+        fig3 = px.line(filtered_eating_df, x='year', y=['count_emp_722511', 'count_emp_722513', 'count_emp_722515', 'count_emp_722410'],
                     labels={'value': 'Employment Count', 'year': 'Year'},
                     title='Employment in Eating Establishments Over Time')
 
