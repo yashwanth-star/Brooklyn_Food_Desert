@@ -1,7 +1,7 @@
 ---
 
 # Food Desert Analysis in Brooklyn 
-https://samplefooddesert01.streamlit.app/ (App Still underdevelopment)
+https://brooklyn-food-desert.streamlit.app/ (App Still underdevelopment)
 
 ## Overview
 The Food Desert Analysis App is a web application built using Streamlit. It allows users to visualize, analyze, and interact with data related to food deserts in Brooklyn. The app features a user-friendly interface with various functionalities including interactive maps, data visualization, statistical analysis, and more.
