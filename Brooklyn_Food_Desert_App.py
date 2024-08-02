@@ -221,14 +221,11 @@ def main():
         r2 = [x + bar_width for x in r1]
         r3 = [x + bar_width for x in r2]
 
-        # Rename columns for display
-        convStores_df = convStores_df.rename(columns=column_mapping)
-
         # Create the plot
         fig4 = go.Figure(data=[
-            go.Bar(name='Alcohol', x=years, y=convStores_df['Alcohol'], marker_color='blue', width=bar_width),
-            go.Bar(name='Food stores', x=years, y=convStores_df['Food stores'], marker_color='red', width=bar_width),
-            go.Bar(name='Cigarettes', x=years, y=convStores_df['Cigarettes'], marker_color='green', width=bar_width)
+            go.Bar(name='Alcohol', x=years, y=convStores_df['count_emp_4453'], marker_color='blue', width=bar_width),
+            go.Bar(name='Food stores', x=years, y=convStores_df['count_emp_445120'], marker_color='red', width=bar_width),
+            go.Bar(name='Cigarettes', x=years, y=convStores_df['count_emp_453991'], marker_color='green', width=bar_width)
         ])
 
         # Update layout
@@ -255,15 +252,12 @@ def main():
         r3 = [x + bar_width for x in r2]
         r4 = [x + bar_width for x in r3]
 
-        # Rename columns for display
-        eating_df = eating_df.rename(columns=column_mapping)
-
         # Create the plot
         fig5 = go.Figure(data=[
-            go.Bar(name='Restaurants', x=years, y=eating_df['Restaurants'], marker_color='green', width=bar_width),
-            go.Bar(name='Fast-foods', x=years, y=eating_df['Fast-foods'], marker_color='red', width=bar_width),
-            go.Bar(name='Snack places', x=years, y=eating_df['Snack places'], marker_color='purple', width=bar_width),
-            go.Bar(name='Drinking places', x=years, y=eating_df['Drinking places'], marker_color='orange', width=bar_width)
+            go.Bar(name='Restaurants', x=years, y=eating_df['count_emp_722511'], marker_color='green', width=bar_width),
+            go.Bar(name='Fast-foods', x=years, y=eating_df['count_emp_722513'], marker_color='red', width=bar_width),
+            go.Bar(name='Snack places', x=years, y=eating_df['count_emp_722515'], marker_color='purple', width=bar_width),
+            go.Bar(name='Drinking places', x=years, y=eating_df['count_emp_722410'], marker_color='orange', width=bar_width)
         ])
 
         # Update layout
