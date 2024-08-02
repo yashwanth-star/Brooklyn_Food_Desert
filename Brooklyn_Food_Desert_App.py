@@ -9,15 +9,13 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
-# Cache the data loading and processing functions
-@st.cache_data
-def load_lila_data():
-    data = pd.read_csv('LILAZones_geo.csv')
-    data['geometry'] = data['geometry'].apply(wkt.loads)
-    gdf = gpd.GeoDataFrame(data, geometry='geometry')
-    gdf.set_crs(epsg=4326, inplace=True)  # Set CRS to WGS84
-    return gdf
+# Load the datasets for Data Analysis
+socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
+convStores_df = pd.read_csv('dataset_convStores.csv')
+eating_df = pd.read_csv('dataset_eating.csv')
+corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
 
+# Load and process the data
 @st.cache_resource
 def load_and_process_data(data_path):
     data = pd.read_csv(data_path)
@@ -26,32 +24,37 @@ def load_and_process_data(data_path):
     gdf.set_crs(epsg=4326, inplace=True)
     return gdf
 
-# Load and process the data for supermarkets
+# Load and process the data for LILA zones
+@st.cache_data
+def load_lila_data():
+    data = pd.read_csv('LILAZones_geo.csv')
+    data['geometry'] = data['geometry'].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(data, geometry='geometry')
+    gdf.set_crs(epsg=4326, inplace=True)  # Set CRS to WGS84
+    return gdf
+
+# Load the GeoDataFrames for supermarkets and fast food
 supermarket_data_path = "supermarkets.csv"
 gdf_supermarkets = load_and_process_data(supermarket_data_path)
 
-# Load and process the data for fast food
 fast_food_data_path = "Fast Food Restaurants.csv"
 gdf_fast_food = load_and_process_data(fast_food_data_path)
 
-# Load the datasets for data analysis
-socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
-convStores_df = pd.read_csv('dataset_convStores.csv')
-eating_df = pd.read_csv('dataset_eating.csv')
-corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
-
-# Function to create a folium map
+# Function to create a folium map for a given year and optionally filter by rank
 def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank, legend_name):
+    # Create a base map
     m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Centered around New York
-
-    if year not in gdf.columns or rank_col not in gdf.columns:
-        st.error(f"Column '{year}' or '{rank_col}' does not exist in the data.")
+    
+    # Check if columns exist
+    if coverage_ratio_col not in gdf.columns or rank_col not in gdf.columns:
+        st.error(f"Column '{coverage_ratio_col}' or '{rank_col}' does not exist in the data.")
         return m
-
+    
+    # Filter GeoDataFrame if a specific rank is selected
     gdf_filtered = gdf.copy()
     if selected_rank and selected_rank != 'All':
         gdf_filtered = gdf_filtered[gdf_filtered[rank_col] == selected_rank]
-
+    
     folium.Choropleth(
         geo_data=gdf_filtered,
         name='choropleth',
@@ -63,7 +66,7 @@ def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank, legend_na
         line_opacity=0.2,
         legend_name=legend_name
     ).add_to(m)
-
+    
     folium.GeoJson(
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
@@ -73,7 +76,7 @@ def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank, legend_na
             localize=True
         )
     ).add_to(m)
-
+    
     folium.LayerControl().add_to(m)
     return m
 
@@ -92,31 +95,32 @@ def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
                 unsafe_allow_html=True
             )
 
-# Function to sort rank options
+# Function to sort ranks
 def sort_ranks(rank):
     try:
         return int(rank)
     except ValueError:
-        return float('inf')
+        return rank
 
-# Data analysis page
 def run_data_analysis():
     st.title("Interactive Data Analysis Page")
 
     ### 1. Family Income vs Race (2016-2020)
     st.header("Family Income vs Race (2016-2020)")
 
+    # Filter options
     races = {'MEDFAMINC16_20': 'All', 'MEDFAMINC_NHWHITE16_20': 'White', 'MEDFAMINC_BLACK16_20': 'Black', 'MEDFAMINC_HISPANIC16_20': 'Hispanic'}
-    selected_races = st.multiselect('Select races to display', list(races.keys()), default=list(races.keys()))
+    selected_races = st.multiselect('Select races to display', options=list(races.keys()), format_func=lambda x: races[x], default=list(races.keys()))
 
+    # Filter the dataframe
     filtered_income_df = socioeconomics_df[selected_races]
 
+    # Create the plot
     fig1 = px.box(filtered_income_df, 
-                 labels={'value': 'Family Income', 'variable': 'Race'},
-                 title='Family Income vs Race (2016-2020)')
+                labels={'value': 'Family Income', 'variable': 'Race'},
+                title='Family Income vs Race (2016-2020)')
 
-    fig1.for_each_trace(lambda t: t.update(name=races[t.name]))
-
+    # Display the plot in Streamlit
     st.plotly_chart(fig1)
 
     st.markdown("""
@@ -133,8 +137,8 @@ def run_data_analysis():
     filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
 
     fig2 = px.line(filtered_convStores_df, x='year', y=['count_emp_4453', 'count_emp_453991', 'count_emp_445120'],
-                  labels={'value': 'Employment Count', 'year': 'Year'},
-                  title='Employment in Convenience Stores Over Time')
+                labels={'value': 'Employment Count', 'year': 'Year'},
+                title='Employment in Convenience Stores Over Time')
 
     st.plotly_chart(fig2)
 
@@ -152,8 +156,8 @@ def run_data_analysis():
     filtered_eating_df = eating_df[(eating_df['year'] >= selected_years_eating[0]) & (eating_df['year'] <= selected_years_eating[1])]
 
     fig3 = px.line(filtered_eating_df, x='year', y=['count_emp_722511', 'count_emp_722513', 'count_emp_722515', 'count_emp_722410'],
-                  labels={'value': 'Employment Count', 'year': 'Year'},
-                  title='Employment in Eating Establishments Over Time')
+                labels={'value': 'Employment Count', 'year': 'Year'},
+                title='Employment in Eating Establishments Over Time')
 
     st.plotly_chart(fig3)
 
@@ -237,7 +241,6 @@ def run_data_analysis():
     This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
     """)
 
-# Main function to create the app
 def main():
     st.sidebar.title("Navigation")
     page_icons = {
@@ -259,7 +262,7 @@ def main():
     
     elif selection == "Data Analysis":
         run_data_analysis()
-        
+
     elif selection == "Data Visualization":
         tabs = st.tabs(["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
 
@@ -272,22 +275,17 @@ def main():
                 options=["All"] + gdf['NTA Name'].unique().tolist()
             )
 
-            if search_query_nta != "All":
-                search_query_tract_options = gdf[gdf['NTA Name'] == search_query_nta]['Census Tract Area'].unique().tolist()
-            else:
-                search_query_tract_options = gdf['Census Tract Area'].unique().tolist()
-
             search_query_tract = st.selectbox(
                 "Search for Census Tract Area:",
-                options=["All"] + search_query_tract_options
+                options=["All"] + (gdf[gdf['NTA Name'] == search_query_nta]['TRACTCE'].unique().tolist() if search_query_nta != "All" else gdf['TRACTCE'].unique().tolist())
             )
 
             if search_query_nta != "All" and search_query_tract != "All":
-                filtered_gdf = gdf[(gdf['NTA Name'] == search_query_nta) & (gdf['Census Tract Area'] == search_query_tract)]
+                filtered_gdf = gdf[(gdf['NTA Name'] == search_query_nta) & (gdf['TRACTCE'] == search_query_tract)]
             elif search_query_nta != "All":
                 filtered_gdf = gdf[gdf['NTA Name'] == search_query_nta]
             elif search_query_tract != "All":
-                filtered_gdf = gdf[gdf['Census Tract Area'] == search_query_tract]
+                filtered_gdf = gdf[gdf['TRACTCE'] == search_query_tract]
             else:
                 filtered_gdf = gdf
 
@@ -301,7 +299,7 @@ def main():
                     'fillOpacity': 0.6,
                 },
                 tooltip=folium.GeoJsonTooltip(
-                    fields=['Census Tract Area', 'NTA Name', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %'],
+                    fields=['TRACTCE', 'NTA Name', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %'],
                     aliases=['Census Tract Area:', 'NTA Name:', 'Food Index:', 'Median Family Income:', 'Poverty Rate:', 'SNAP Benefits:'],
                     localize=True
                 )
@@ -312,7 +310,7 @@ def main():
                 for i, row in details.iterrows():
                     st.markdown(f"""
                         <div style="border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 20px 0; background-color: #f9f9f9;">
-                            <h4 style="color: #2E8B57;">{row['NTA Name']} - Census Tract Area: {row['Census Tract Area']}</h4>
+                            <h4 style="color: #2E8B57;">{row['NTA Name']} - Census Tract Area: {row['TRACTCE']}</h4>
                             <p><strong style="color: #FF6347;">Food Index:</strong> {row['Food Index']}</p>
                             <p><strong style="color: #4682B4;">Median Family Income:</strong> {row[' Median Family Income ']}</p>
                             <p><strong style="color: #8A2BE2;">Poverty Rate:</strong> {row['Education below high school diploma (Poverty Rate)']}</p>
@@ -320,17 +318,8 @@ def main():
                         </div>
                     """, unsafe_allow_html=True)
 
-            if search_query_nta != "All":
-                if search_query_tract == "All":
-                    details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                    st.subheader(f"Details for {search_query_nta}")
-                    display_info(details)
-                else:
-                    details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                    display_info(details)
-            elif search_query_tract != "All":
-                details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                st.subheader(f"Details for Census Tract Area {search_query_tract}")
+            if search_query_nta != "All" or search_query_tract != "All":
+                details = filtered_gdf[['NTA Name', 'TRACTCE', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
                 display_info(details)
 
         with tabs[1]:
@@ -377,11 +366,13 @@ def main():
                 filtered_gdf = gdf_fast_food[gdf_fast_food[f'{year}_rank'] == selected_rank]
                 display_tooltip_info(filtered_gdf, year, f'{year}_Fast Food Coverage Ratio')
 
+        # Share App button with Gmail link
         share_text = "Check out this Food Desert Analysis App!"
         app_link = "https://samplefooddesert01.streamlit.app/"
         mailto_link = f"mailto:?subject=Food Desert Analysis App&body={share_text}%0A{app_link}"
         st.sidebar.markdown(f'<a href="{mailto_link}" target="_blank"><button style="background-color:green;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Share App via Email</button></a>', unsafe_allow_html=True)
 
+        # Download CSV button
         csv = gdf_supermarkets.to_csv(index=False)
         b64 = base64.b64encode(csv.encode()).decode()
         href = f'<a href="data:file/csv;base64,{b64}" download="supermarkets.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
