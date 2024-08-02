@@ -2,47 +2,57 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import folium
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium, folium_static
 from shapely import wkt
 import base64
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
-# Cache the data loading and processing function
+# Set up the page configuration
+st.set_page_config(page_title="Food Desert Analysis App", layout="wide")
+
+# Load and cache the data for LILA & Non-LILA Zones
 @st.cache_data
-def load_data(file_path):
-    data = pd.read_csv(file_path)
+def load_lila_data():
+    data = pd.read_csv('LILAZones_geo.csv')
     data['geometry'] = data['geometry'].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(data, geometry='geometry')
     gdf.set_crs(epsg=4326, inplace=True)  # Set CRS to WGS84
     return gdf
 
-# Load and process the data
-lila_data_path = 'LILAZones_geo.csv'
-gdf_lila = load_data(lila_data_path)
+# Load and process the data for supermarkets
+@st.cache_resource
+def load_and_process_data(data_path):
+    data = pd.read_csv(data_path)
+    data['geometry'] = data['geometry'].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(data, geometry='geometry')
+    gdf.set_crs(epsg=4326, inplace=True)
+    return gdf
 
+gdf_lila = load_lila_data()
 supermarket_data_path = "supermarkets.csv"
-gdf_supermarkets = load_data(supermarket_data_path)
-
+gdf_supermarkets = load_and_process_data(supermarket_data_path)
 fast_food_data_path = "Fast Food Restaurants.csv"
-gdf_fast_food = load_data(fast_food_data_path)
+gdf_fast_food = load_and_process_data(fast_food_data_path)
 
-# Load additional datasets for data analysis page
+# Load the datasets for data analysis
 socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
 convStores_df = pd.read_csv('dataset_convStores.csv')
 eating_df = pd.read_csv('dataset_eating.csv')
 corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
 
-# Function to create a folium map for a given year and optionally filter by rank
-def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, legend_name="Coverage Ratio"):
-    # Create a base map
+# Mapping dictionary for column names
+column_mapping = {
+    'MEDFAMINC16_20': 'All',
+    'MEDFAMINC_NHWHITE16_20': 'White',
+    'MEDFAMINC_BLACK16_20': 'Black',
+    'MEDFAMINC_HISPANIC16_20': 'Hispanic'
+}
+
+# Function to create a folium map
+def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank, legend_name):
     m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Centered around New York
-    
-    # Check if columns exist
-    if coverage_ratio_col not in gdf.columns or rank_col not in gdf.columns:
-        st.error(f"Column '{coverage_ratio_col}' or '{rank_col}' does not exist in the data.")
-        return m
     
     # Filter GeoDataFrame if a specific rank is selected
     gdf_filtered = gdf.copy()
@@ -67,7 +77,7 @@ def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, lege
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
         tooltip=folium.GeoJsonTooltip(
             fields=['TRACTCE', coverage_ratio_col, rank_col],
-            aliases=['Census Tract Area', f'{year} {legend_name}', 'Rank'],
+            aliases=['Census Tract Area', coverage_ratio_col, 'Rank'],
             localize=True
         )
     ).add_to(m)
@@ -117,11 +127,14 @@ def main():
         st.header("Family Income vs Race (2016-2020)")
 
         # Filter options
-        races = list(socioeconomics_df.columns)  # Convert Index to list
-        selected_races = st.multiselect('Select races to display', races, default=races)
+        races = list(column_mapping.keys())  # Use original column names
+        selected_races = st.multiselect('Select races to display', races, default=races, format_func=lambda x: column_mapping[x])
 
         # Filter the dataframe
         filtered_income_df = socioeconomics_df[selected_races]
+
+        # Rename columns for display
+        filtered_income_df = filtered_income_df.rename(columns=column_mapping)
 
         # Create the plot
         fig1 = px.box(filtered_income_df, 
@@ -281,31 +294,31 @@ def main():
 
         with tabs[0]:
             st.header("LILA & Non-LILA Zones")
+            gdf = load_lila_data()
 
-            # Initial filter
-            nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
-            nta_selected = st.selectbox("Search for NTA Name:", nta_options)
+            search_query_nta = st.selectbox(
+                "Search for NTA Name:",
+                options=["All"] + gdf['NTA Name'].unique().tolist()
+            )
 
-            # Filter the GeoDataFrame based on the selected NTA Name
-            if nta_selected != "All":
-                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
+            if search_query_nta != "All":
+                search_query_tract_options = gdf[gdf['NTA Name'] == search_query_nta]['Census Tract Area'].unique().tolist()
             else:
-                filtered_gdf = gdf_lila
+                search_query_tract_options = gdf['Census Tract Area'].unique().tolist()
 
-            # Census Tract Area filter based on the filtered GeoDataFrame
-            tract_options = ["All"] + filtered_gdf['Census Tract Area'].unique().tolist()
-            tract_selected = st.selectbox("Search for Census Tract Area:", tract_options)
+            search_query_tract = st.selectbox(
+                "Search for Census Tract Area:",
+                options=["All"] + search_query_tract_options
+            )
 
-            # Update the filtering logic to highlight the selected Census Tract Area
-            if tract_selected != "All":
-                filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == tract_selected]
-                # Ensure NTA dropdown is updated according to selected Census Tract Area
-                nta_options = ["All"] + filtered_gdf['NTA Name'].unique().tolist()
-                nta_selected = nta_options[1] if nta_selected == "All" else nta_selected
-            elif nta_selected != "All":
-                filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
+            if search_query_nta != "All" and search_query_tract != "All":
+                filtered_gdf = gdf[(gdf['NTA Name'] == search_query_nta) & (gdf['Census Tract Area'] == search_query_tract)]
+            elif search_query_nta != "All":
+                filtered_gdf = gdf[gdf['NTA Name'] == search_query_nta]
+            elif search_query_tract != "All":
+                filtered_gdf = gdf[gdf['Census Tract Area'] == search_query_tract]
             else:
-                filtered_gdf = gdf_lila
+                filtered_gdf = gdf
 
             m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)
             folium.GeoJson(
@@ -322,7 +335,7 @@ def main():
                     localize=True
                 )
             ).add_to(m)
-            folium_static(m, width=800, height=600)
+            st_folium(m, width=800, height=600)
 
             def display_info(details):
                 for i, row in details.iterrows():
@@ -336,10 +349,10 @@ def main():
                         </div>
                     """, unsafe_allow_html=True)
 
-            if nta_selected != "All":
-                if tract_selected == "All":
+            if search_query_nta != "All":
+                if search_query_tract == "All":
                     details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
-                    st.subheader(f"Details for {nta_selected}")
+                    st.subheader(f"Details for {search_query_nta}")
                     display_info(details)
                 else:
                     details = filtered_gdf[['NTA Name', 'Census Tract Area', 'Food Index', ' Median Family Income ', 'Education below high school diploma (Poverty Rate)', 'SNAP Benefits %']]
@@ -359,11 +372,11 @@ def main():
             )
 
             # Add a select box for Rank search
-            rank_options = ['All'] + sorted([rank for rank in gdf_supermarkets[f'{year}_rank'].dropna().unique() if rank.isdigit()], key=int)
+            rank_options = ['All'] + sorted(set([rank for rank in gdf_supermarkets[f'{year}_rank'] if pd.notna(rank)]), key=lambda x: (isinstance(x, str), x))
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
 
             # Create and display the map
-            m = create_map(gdf_supermarkets, year, f'{year}_supermarket coverage ratio', f'{year}_rank', selected_rank, "Supermarket Coverage Ratio")
+            m = create_map(gdf_supermarkets, year, f'{year}_supermarket coverage ratio', f'{year}_rank', selected_rank, 'Supermarket Coverage Ratio')
             folium_static(m)
 
             # Display the tooltip information below the map if a specific rank is selected
@@ -385,11 +398,11 @@ def main():
             )
 
             # Add a select box for Rank search
-            rank_options = ['All'] + sorted([rank for rank in gdf_fast_food[f'{year}_rank'].dropna().unique() if rank.isdigit()], key=int)
+            rank_options = ['All'] + sorted(set([rank for rank in gdf_fast_food[f'{year}_rank'] if pd.notna(rank)]), key=lambda x: (isinstance(x, str), x))
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
 
             # Create and display the map
-            m = create_map(gdf_fast_food, year, f'{year}_Fast Food Coverage Ratio', f'{year}_rank', selected_rank, "Fast Food Coverage Ratio")
+            m = create_map(gdf_fast_food, year, f'{year}_Fast Food Coverage Ratio', f'{year}_rank', selected_rank, 'Fast Food Restaurant Coverage Ratio')
             folium_static(m)
 
             # Display the tooltip information below the map if a specific rank is selected
