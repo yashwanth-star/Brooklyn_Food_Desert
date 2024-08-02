@@ -4,10 +4,10 @@ import geopandas as gpd
 import folium
 from streamlit_folium import folium_static
 from shapely import wkt
+import base64
 import plotly.express as px
 import plotly.figure_factory as ff
-import base64
-import plotly
+import plotly.graph_objects as go
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -27,6 +27,12 @@ gdf_supermarkets = load_data(supermarket_data_path)
 
 fast_food_data_path = "Fast Food Restaurants.csv"
 gdf_fast_food = load_data(fast_food_data_path)
+
+# Load additional datasets for data analysis page
+socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
+convStores_df = pd.read_csv('dataset_convStores.csv')
+eating_df = pd.read_csv('dataset_eating.csv')
+corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
 
 # Function to create a folium map for a given year and optionally filter by rank
 def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, legend_name="Coverage Ratio"):
@@ -105,71 +111,165 @@ def main():
         st.write("This app helps to analyze food desert regions in Brooklyn.")
     
     elif selection == "Data Analysis":
-        # Load the datasets for analysis
-        socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
-        convStores_df = pd.read_csv('dataset_convStores.csv')
-        eating_df = pd.read_csv('dataset_eating.csv')
-        corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
-
-        # Interactive Data Analysis Page
         st.title("Interactive Data Analysis Page")
 
-        # 1. Family Income vs Race (2016-2020)
+        ### 1. Family Income vs Race (2016-2020)
         st.header("Family Income vs Race (2016-2020)")
-        races = socioeconomics_df.columns
+
+        # Filter options
+        races = list(socioeconomics_df.columns)  # Convert Index to list
         selected_races = st.multiselect('Select races to display', races, default=races)
+
+        # Filter the dataframe
         filtered_income_df = socioeconomics_df[selected_races]
+
+        # Create the plot
         fig1 = px.box(filtered_income_df, 
-                     labels={'value': 'Family Income', 'variable': 'Race'},
-                     title='Family Income vs Race (2016-2020)')
+                    labels={'value': 'Family Income', 'variable': 'Race'},
+                    title='Family Income vs Race (2016-2020)')
+
+        # Display the plot in Streamlit
         st.plotly_chart(fig1)
+
+        # Explanation
         st.markdown("""
         #### Explanation:
         This boxplot visualizes the distribution of family incomes across different racial groups between 2016 and 2020. Each box represents the interquartile range (IQR), showing the median and spread of the data. The whiskers indicate variability outside the upper and lower quartiles, while points beyond the whiskers are outliers. This visualization helps in identifying income disparities among various racial groups.
         """)
 
-        # 2. Employment in Convenience Stores Over Time
+        ### 2. Employment in Convenience Stores Over Time
         st.header("Employment in Convenience Stores Over Time")
-        years = convStores_df['year'].unique()
-        selected_years = st.slider('Select years', min_value=int(years.min()), max_value=int(years.max()), value=(int(years.min()), int(years.max())))
-        filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years[0]) & (convStores_df['year'] <= selected_years[1])]
+
+        # Filter options
+        years_conv = convStores_df['year'].unique()
+        selected_years_conv = st.slider('Select years for convenience stores', min_value=int(years_conv.min()), max_value=int(years_conv.max()), value=(int(years_conv.min()), int(years_conv.max())), key='slider_conv')
+
+        # Filter the dataframe
+        filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
+
+        # Create the plot
         fig2 = px.line(filtered_convStores_df, x='year', y=['count_emp_4453', 'count_emp_453991', 'count_emp_445120'],
-                      labels={'value': 'Employment Count', 'year': 'Year'},
-                      title='Employment in Convenience Stores Over Time')
+                    labels={'value': 'Employment Count', 'year': 'Year'},
+                    title='Employment in Convenience Stores Over Time')
+
+        # Display the plot in Streamlit
         st.plotly_chart(fig2)
+
+        # Explanation
         st.markdown("""
         #### Explanation:
         This line chart illustrates the trends in employment across different types of stores, including convenience stores, other general stores, and grocery stores over several years. The x-axis represents the years, while the y-axis represents the count of employees. The lines demonstrate how employment levels have changed over time, helping to identify growth or decline trends in these sectors.
         """)
 
-        # 3. Employment in Eating Establishments Over Time
+        ### 3. Employment in Eating Establishments Over Time
         st.header("Employment in Eating Establishments Over Time")
-        years = eating_df['year'].unique()
-        selected_years = st.slider('Select years', min_value=int(years.min()), max_value=int(years.max()), value=(int(years.min()), int(years.max())))
-        filtered_eating_df = eating_df[(eating_df['year'] >= selected_years[0]) & (eating_df['year'] <= selected_years[1])]
+
+        # Filter options
+        years_eating = eating_df['year'].unique()
+        selected_years_eating = st.slider('Select years for eating establishments', min_value=int(years_eating.min()), max_value=int(years_eating.max()), value=(int(years_eating.min()), int(years_eating.max())), key='slider_eating')
+
+        # Filter the dataframe
+        filtered_eating_df = eating_df[(eating_df['year'] >= selected_years_eating[0]) & (eating_df['year'] <= selected_years_eating[1])]
+
+        # Create the plot
         fig3 = px.line(filtered_eating_df, x='year', y=['count_emp_722511', 'count_emp_722513', 'count_emp_722515', 'count_emp_722410'],
-                      labels={'value': 'Employment Count', 'year': 'Year'},
-                      title='Employment in Eating Establishments Over Time')
+                    labels={'value': 'Employment Count', 'year': 'Year'},
+                    title='Employment in Eating Establishments Over Time')
+
+        # Display the plot in Streamlit
         st.plotly_chart(fig3)
+
+        # Explanation
         st.markdown("""
         #### Explanation:
         This line chart displays employment trends in various eating establishments, such as full-service restaurants, limited-service restaurants, snack and nonalcoholic beverage bars, and caterers over time. The x-axis denotes the years, and the y-axis indicates the count of employees. This plot helps in understanding how employment in different types of eating establishments has evolved, highlighting periods of growth or decline.
         """)
 
-        # 4. Correlation Heatmap
+        ### 4. Employment in Convenience Stores, Liquor, and Tobacco Stores
+        st.header("Employment in Convenience Stores, Liquor, and Tobacco Stores")
+
+        # Create the grouped bar plot
+        bar_width = 0.2
+        years = convStores_df['year']
+        r1 = range(len(years))
+        r2 = [x + bar_width for x in r1]
+        r3 = [x + bar_width for x in r2]
+
+        # Create the plot
+        fig4 = go.Figure(data=[
+            go.Bar(name='Alcohol', x=years, y=convStores_df['count_emp_4453'], marker_color='blue', width=bar_width),
+            go.Bar(name='Food stores', x=years, y=convStores_df['count_emp_445120'], marker_color='red', width=bar_width),
+            go.Bar(name='Cigarettes', x=years, y=convStores_df['count_emp_453991'], marker_color='green', width=bar_width)
+        ])
+
+        # Update layout
+        fig4.update_layout(barmode='group', xaxis_tickangle=-45, title='Mean Count by Year for Different Categories', xaxis_title='Year', yaxis_title='Mean Count')
+
+        # Display the plot in Streamlit
+        st.plotly_chart(fig4)
+
+        # Explanation
+        st.markdown("""
+        #### Explanation:
+        This grouped bar plot visualizes the mean count of employees in convenience stores, liquor stores, and tobacco stores over several years. Each group of bars represents a different year, and within each group, there are bars for alcohol, food stores, and cigarettes. This plot helps in understanding the employment trends in these specific categories over time.
+        """)
+
+        ### 5. Employment in Eating & Drinking Data
+        st.header("Employment in Eating & Drinking Data")
+
+        # Create the grouped bar plot
+        bar_width = 0.35
+        years = eating_df['year']
+        indices = range(len(years))
+        r1 = indices
+        r2 = [x + bar_width for x in r1]
+        r3 = [x + bar_width for x in r2]
+        r4 = [x + bar_width for x in r3]
+
+        # Create the plot
+        fig5 = go.Figure(data=[
+            go.Bar(name='Restaurants', x=years, y=eating_df['count_emp_722511'], marker_color='green', width=bar_width),
+            go.Bar(name='Fast-foods', x=years, y=eating_df['count_emp_722513'], marker_color='red', width=bar_width),
+            go.Bar(name='Snack places', x=years, y=eating_df['count_emp_722515'], marker_color='purple', width=bar_width),
+            go.Bar(name='Drinking places', x=years, y=eating_df['count_emp_722410'], marker_color='orange', width=bar_width)
+        ])
+
+        # Update layout
+        fig5.update_layout(barmode='group', xaxis_tickangle=-45, title='Mean Count by Year for Different Categories', xaxis_title='Year', yaxis_title='Mean Count')
+
+        # Display the plot in Streamlit
+        st.plotly_chart(fig5)
+
+        # Explanation
+        st.markdown("""
+        #### Explanation:
+        This grouped bar plot visualizes the mean count of employees in various types of eating and drinking establishments over several years. Each group of bars represents a different year, and within each group, there are bars for restaurants, fast-foods, snack places, and drinking places. This plot helps in understanding the employment trends in these specific categories over time.
+        """)
+
+        ### 6. Correlation Heatmap
         st.header("Correlation Heatmap")
-        columns = corrPlot_df.columns
+
+        # Filter options
+        columns = list(corrPlot_df.columns)  # Convert Index to list
         selected_columns = st.multiselect('Select columns for correlation', columns, default=columns)
+
+        # Filter the dataframe
         filtered_corr_df = corrPlot_df[selected_columns]
+
+        # Create the correlation heatmap
         corr = filtered_corr_df.corr()
-        fig4 = ff.create_annotated_heatmap(
+        fig6 = ff.create_annotated_heatmap(
             z=corr.values,
             x=list(corr.columns),
             y=list(corr.index),
             annotation_text=corr.round(2).values,
             colorscale='Viridis'
         )
-        st.plotly_chart(fig4)
+
+        # Display the plot in Streamlit
+        st.plotly_chart(fig6)
+
+        # Explanation
         st.markdown("""
         #### Explanation:
         This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
