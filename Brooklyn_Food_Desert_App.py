@@ -5,6 +5,9 @@ import folium
 from streamlit_folium import folium_static
 from shapely import wkt
 import base64
+import plotly.express as px
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -81,7 +84,7 @@ def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
                 unsafe_allow_html=True
             )
 
-# Function to run data analysis page
+# Function to handle data analysis page
 def run_data_analysis():
     # Load the datasets
     socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
@@ -89,7 +92,6 @@ def run_data_analysis():
     eating_df = pd.read_csv('dataset_eating.csv')
     corrPlot_df = pd.read_csv('dataset_forCorrPlot.csv')
 
-    # Title
     st.title("Interactive Data Analysis Page")
 
     ### 1. Family Income vs Race (2016-2020)
