@@ -282,10 +282,11 @@ def main():
         "Data Analysis": "📊",
         "Data Visualization": "📈",
         "Comments": "💬",
-        "Guide": "📖"
+        "Guide": "📖",
+        "Food Policy Reports": "📑"
     }
 
-    pages = ["Home", "Data Analysis", "Data Visualization", "Comments", "Guide"]
+    pages = ["Home", "Data Analysis", "Data Visualization", "Comments", "Guide", "Food Policy Reports"]
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     st.title(selection)
@@ -430,6 +431,18 @@ def main():
         b64 = base64.b64encode(csv.encode()).decode()
         href = f'<a href="data:file/csv;base64,{b64}" download="LILAZones_geo.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
         st.sidebar.markdown(href, unsafe_allow_html=True)
+
+    elif selection == "Food Policy Reports":
+        st.markdown(
+            """
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="https://www.nyc.gov/site/foodpolicy/reports-and-data/food-metrics-report.page" target="_blank">
+                    <button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Visit Food Policy Reports</button>
+                </a>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     elif selection == "Comments":
         st.write("Leave your comments here:")
