@@ -274,6 +274,71 @@ def run_data_analysis():
     This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
     """)
 
+# Function to handle Food Policy Reports page
+def run_food_policy_reports():
+    # Video
+    video_file = open('3245641-uhd_3840_2160_25fps.mp4', 'rb')
+    video_bytes = video_file.read()
+    video_base64 = base64.b64encode(video_bytes).decode('utf-8')
+    video_html = f'''
+    <video autoplay loop muted width="100%">
+        <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+    </video>
+    '''
+    st.markdown(video_html, unsafe_allow_html=True)
+
+    # Link to Food Policy Reports page
+    st.markdown(
+        '''
+        <a href="https://www.nyc.gov/site/foodpolicy/reports-and-data/food-metrics-report.page" target="_blank" class="btn btn-primary" style="text-decoration: none;">
+            <button style="background-color: #0044cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                Visit Food Policy Reports
+            </button>
+        </a>
+        ''',
+        unsafe_allow_html=True
+    )
+
+    # Content
+    st.markdown("""
+    ## Importance of Food Policy Reports
+
+    Food policy reports are essential tools for shaping a sustainable and equitable food system. These reports, provided by the New York City Council, offer comprehensive data and insights into various aspects of food production, distribution, and consumption. They help policymakers, stakeholders, and the public understand the current state of the food landscape and the impact of food policies.
+
+    ### Why Food Policy Reports Matter
+
+    1. **Data-Driven Decision Making**: Food policy reports compile critical data from multiple sources, offering a detailed analysis of food-related issues. This information is crucial for making informed decisions that affect food security, nutrition, and public health.
+
+    2. **Tracking Progress**: These reports track the progress of food-related initiatives and programs over time. By evaluating trends and outcomes, policymakers can assess the effectiveness of existing policies and identify areas needing improvement.
+
+    3. **Addressing Food Insecurity**: Food policy reports highlight the prevalence and causes of food insecurity. By understanding the root causes, policymakers can implement targeted strategies to ensure that all community members have access to nutritious and affordable food.
+
+    4. **Promoting Healthy Eating**: The reports provide insights into dietary trends and health outcomes, guiding initiatives that promote healthy eating habits. They support programs aimed at reducing diet-related diseases, such as obesity and diabetes, by increasing access to healthy food options.
+
+    5. **Sustainability and Justice**: Food policy reports emphasize the importance of creating a sustainable and just food system. They address environmental impacts, food waste, and social equity, advocating for practices that protect the planet and ensure fair treatment for all workers within the food supply chain.
+
+    6. **Public Awareness and Engagement**: By making food policy reports accessible to the public, these documents foster greater awareness and engagement. Citizens can better understand the challenges and opportunities within the food system and participate in shaping policies that affect their communities.
+
+    ### Explore Our Reports
+
+    To learn more about these initiatives and their impact, explore our comprehensive food policy reports provided by the New York City Council:
+
+    - [2023 Food Standards Compliance Report & 2023 Food by the Numbers](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food%20Standards%20FY23%20Compliance%20Report_Final.pdf)
+    - [2022 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food%20Metrics%20Report%20FY%202022_FINAL.pdf)
+    - [2021 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food-Metrics-Report-2021.pdf)
+    - [2020 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/food_metrics_report_2020-two_page_spread.pdf)
+    - [2019 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food-Policy-Report-2019.pdf)
+    - [2018 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2018-Food-Metrics-Report.pdf)
+    - [2017 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2017-Food-Metrics-Report-Corrected.pdf)
+    - [2016 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2016-Food-Metrics-Report.pdf)
+    - [2015 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2015-food-metrics-report.pdf)
+    - [2014 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2014-food-metrics-report.pdf)
+    - [2013 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2013.pdf)
+    - [2012 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2012.pdf)
+
+    Food policy reports are invaluable resources provided by the New York City Council that guide our journey toward a healthier, more equitable, and sustainable food system. By leveraging the data and insights provided in these reports, we can implement effective policies and initiatives that benefit everyone.
+    """)
+
 # Main function to create the app
 def main():
     st.sidebar.title("Navigation")
@@ -281,7 +346,7 @@ def main():
         "Home": "🏠",
         "Data Analysis": "📊",
         "Data Visualization": "📈",
-        "Food Policy Reports": "📑",
+        "Food Policy Reports": "📄",
         "Comments": "💬",
         "Guide": "📖"
     }
@@ -433,72 +498,7 @@ def main():
         st.sidebar.markdown(href, unsafe_allow_html=True)
 
     elif selection == "Food Policy Reports":
-        # Title
-        st.title("Food Policy Reports")
-
-        # Video
-        video_file = open('3245641-uhd_3840_2160_25fps.mp4', 'rb')
-        video_bytes = video_file.read()
-        video_base64 = base64.b64encode(video_bytes).decode('utf-8')
-        video_html = f'''
-        <video autoplay loop muted width="100%">
-            <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-        </video>
-        '''
-        st.markdown(video_html, unsafe_allow_html=True)
-
-        # Link to Food Policy Reports page
-        st.markdown(
-            '''
-            <a href="https://www.nyc.gov/site/foodpolicy/reports-and-data/food-metrics-report.page" target="_blank" class="btn btn-primary" style="text-decoration: none;">
-                <button style="background-color: #0044cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                    Visit Food Policy Reports
-                </button>
-            </a>
-            ''',
-            unsafe_allow_html=True
-        )
-
-        # Content
-        st.markdown("""
-        ## Importance of Food Policy Reports
-
-        Food policy reports are essential tools for shaping a sustainable and equitable food system. These reports, provided by the New York City Council, offer comprehensive data and insights into various aspects of food production, distribution, and consumption. They help policymakers, stakeholders, and the public understand the current state of the food landscape and the impact of food policies.
-
-        ### Why Food Policy Reports Matter
-
-        1. **Data-Driven Decision Making**: Food policy reports compile critical data from multiple sources, offering a detailed analysis of food-related issues. This information is crucial for making informed decisions that affect food security, nutrition, and public health.
-
-        2. **Tracking Progress**: These reports track the progress of food-related initiatives and programs over time. By evaluating trends and outcomes, policymakers can assess the effectiveness of existing policies and identify areas needing improvement.
-
-        3. **Addressing Food Insecurity**: Food policy reports highlight the prevalence and causes of food insecurity. By understanding the root causes, policymakers can implement targeted strategies to ensure that all community members have access to nutritious and affordable food.
-
-        4. **Promoting Healthy Eating**: The reports provide insights into dietary trends and health outcomes, guiding initiatives that promote healthy eating habits. They support programs aimed at reducing diet-related diseases, such as obesity and diabetes, by increasing access to healthy food options.
-
-        5. **Sustainability and Justice**: Food policy reports emphasize the importance of creating a sustainable and just food system. They address environmental impacts, food waste, and social equity, advocating for practices that protect the planet and ensure fair treatment for all workers within the food supply chain.
-
-        6. **Public Awareness and Engagement**: By making food policy reports accessible to the public, these documents foster greater awareness and engagement. Citizens can better understand the challenges and opportunities within the food system and participate in shaping policies that affect their communities.
-
-        ### Explore Our Reports
-
-        To learn more about these initiatives and their impact, explore our comprehensive food policy reports provided by the New York City Council:
-
-        - [2023 Food Standards Compliance Report & 2023 Food by the Numbers](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food%20Standards%20FY23%20Compliance%20Report_Final.pdf)
-        - [2022 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food%20Metrics%20Report%20FY%202022_FINAL.pdf)
-        - [2021 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food-Metrics-Report-2021.pdf)
-        - [2020 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/food_metrics_report_2020-two_page_spread.pdf)
-        - [2019 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/Food-Policy-Report-2019.pdf)
-        - [2018 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2018-Food-Metrics-Report.pdf)
-        - [2017 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2017-Food-Metrics-Report-Corrected.pdf)
-        - [2016 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2016-Food-Metrics-Report.pdf)
-        - [2015 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2015-food-metrics-report.pdf)
-        - [2014 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2014-food-metrics-report.pdf)
-        - [2013 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2013.pdf)
-        - [2012 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2012.pdf)
-
-
-        Food policy reports are invaluable resources provided by the New York City Council that guide our journey toward a healthier, more equitable, and sustainable food system. By leveraging the data and insights provided in these reports, we can implement effective policies and initiatives that benefit everyone.
-        """)
+        run_food_policy_reports()
 
     elif selection == "Comments":
         st.write("Leave your comments here:")
