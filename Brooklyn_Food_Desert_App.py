@@ -294,12 +294,12 @@ def run_data_analysis():
 
     #### Let's look at an example to illustrate these metrics:
 
-    - **Tract 28100 (Bedford-Stuyvesant East)**:
-      - Median Family Income: $25,625
-      - Relative Scale (Highest): 10. Calculation of the figure is as follows, $ 25, 000 being one hundred percent and twenty five percent of this figure is, 5,000 $ 25 percent of the median family income or $ 5,000 or 25 percent of the HIJI as prefixed above is, therefore, an acceptable measure.
-      - Relative Scale (Average): 34. It is calculated as 10% of the average of median family incomes.
-      - Income Deviation (Highest): 89. 75
-      - Income Deviation (Average): 65. 90
+      **Tract 28100 (Bedford-Stuyvesant East):**
+      - **Median Family Income**: $25,625
+      - **Relative Scale (Highest)**: 10. Calculation of the figure is as follows, $25,625 being one hundred percent, and twenty-five percent of this figure is $6,406.25. Therefore, an acceptable measure.
+      - **Relative Scale (Average)**: 34. It is calculated as 34% of the average of median family incomes.
+      - **Income Deviation (Highest)**: 89.75
+      - **Income Deviation (Average)**: 65.90
 
     #### Analysing the Data:
     - **Income Distribution**:
