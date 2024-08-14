@@ -266,7 +266,7 @@ def run_data_analysis():
     )
 
     # Display the plot in Streamlit
-    st.plotly_chart(fig
+    st.plotly_chart(fig)
 
 # Function to handle food policy reports page
 def run_food_policy_reports():
