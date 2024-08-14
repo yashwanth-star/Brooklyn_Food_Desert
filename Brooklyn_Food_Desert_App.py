@@ -274,76 +274,86 @@ def run_data_analysis():
     This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
     """)
 
-    ### 7. Baseline Analysis Median Family Income
+    ### Baseline Analysis Median Family Income
     st.header("Baseline Analysis Median Family Income")
-    
-    # Display the image
-    image_path = 'Baseline Analysis_Med Family Income.png'
-    st.image(image_path, use_column_width=True)
 
-    # Explanation for Baseline Analysis Median Family Income
+    # Load and display image
+    st.image('Baseline Analysis_Med Family Income.png', use_column_width=True)
+
+    # Explanation
     st.markdown("""
-    ### Review and Interpretation of Baseline Analysis of Median Family Income for Brooklyn
+    ## Review and Interpretation of Baseline Analysis of Median Family Income for Brooklyn
 
-    #### Overview:
+    ### Overview:
     The supplementary data set includes median family income data by tracts in both East and West Bedford-Stuyvesant and other parts of Brooklyn. The data is arranged in a way that marks different tracts against the county’s highest and average median family incomes. Here's a breakdown of the key columns and their significance:
 
-    - **TRACTCE**: This corresponds to the census tract code given only to that particular census tract.
-    - **NTA Name**: This is the name of the tabulation area of the neighbourhood that has been developed at the census tract level.
-    - **Median Family Income (USD)**: The income of families in each tract stated in USD.
-    - **Relative Scale (Highest Median Family Income = 100)**: This represents the column of the relative scale of median family income, and is the median family income divided by the largest median family income in the database. A value of 100 embodies the highest median family income while all other states take whole number proportions according to this state.
-    - **Relative Scale (Average Median Family Income = 100)**: As in the previous column, except that values were divided by the average median family income as a scaling factor.
-    - **Income Deviation from Baseline (100 = Highest Median Family Income)**: This depicts the extent to which each tract’s median by family income is above or below the median by family income of the counties with the highest median by family income standardized to 100.
-    - **Income Deviation from Baseline (100 = Average Median Family Income)**: This means the extent of departure from the average median family income index.
+    - **TRACTCE:** This corresponds to the census tract code given only to that particular census tract.
+    - **NTA Name:** This is the name of the tabulation area of the neighbourhood that has been developed at the census tract level.
+    - **Median Family Income (USD):** The income of families in each tract stated in USD.
+    - **Relative Scale (Highest Median Family Income = 100):** This represents the column of the relative scale of median family income, and is the median family income divided by the largest median family income in the database. A value of 100 embodies the highest median family income while all other states take whole number proportions according to this state.
+    - **Relative Scale (Average Median Family Income = 100):** As in the previous column, except that values were divided by the average median family income as a scaling factor.
+    - **Income Deviation from Baseline (100 = Highest Median Family Income):** This depicts the extent to which each tract’s median by family income is above or below the median by family income of the counties with the highest median by family income standardized to 100.
+    - **Income Deviation from Baseline (100 = Average Median Family Income):** This means the extent of departure from the average median family income index.
 
-    #### Let's look at an example to illustrate these metrics:
+    ### Let's look at an example to illustrate these metrics:
 
-    - **Tract 28100 (Bedford-Stuyvesant East)**:
-        - Median Family Income: $25,625
-        - Relative Scale (Highest): 10. Calculation of the figure is as follows, $ 25, 000 being one hundred percent and twenty five percent of this figure is, 5,000 $ 25 percent of the median family income or $ 5,000 or 25 percent of the HIJI as prefixed above is, therefore, an acceptable measure.
-        - Relative Scale (Average): 34. It is calculated as 10% of the average of median family incomes.
-        - Income Deviation (Highest): 89. 75
-        - Income Deviation (Average): 65. 90
+    **Tract 28100 (Bedford-Stuyvesant East):**
 
-    #### Analysing the Data:
-    ##### Income Distribution:
-    - **High-Income Areas**: As seen earlier, relative scales and income deviations are higher for tracts with higher median family income, about 40,000 or more, as observed in the tracts of Bedford-Stuyvesant (East) and Bensonhurst.
-    - **Low-Income Areas**: Of the tracts, notably those located in Brownsville and East New York, tracts with lower medians, exhibit smaller relative scales and substantial negative income differential vis-a-vis the highest and the average medians.
+    - Median Family Income: $25,625
+    - Relative Scale (Highest): 10. Calculation of the figure is as follows, $ 25, 000 being one hundred percent and twenty five percent of this figure is, 5,000 $ 25 percent of the median family income or $ 5,000 or 25 percent of the HIJI as prefixed above is, therefore, an acceptable measure.
+    - Relative Scale (Average): 34. It is calculated as 10% of the average of median family incomes.
+    - Income Deviation (Highest): 89. 75
+    - Income Deviation (Average): 65. 90
 
-    ##### Relative Scales:
-    - **Highest Median Scale**: This is an illustration of how the income of each tract compares to the highest income in the dataset. For instance, Bedford-Stuyvesant (East) at $87,750 has a scale of 35. 10, indicating it's 35. Table 3 revealed that the spending was 1% of the highest median income.
-    - **Average Median Scale**: This results in a wider view of the organization by benchmarking every tract’s income against a per capita income. Places with such values close or above 100 have a higher income level in relation to the overall median income.
+    ### Analysing the Data:
 
-    ##### Income Deviation:
-    - **Positive Deviation**: Points to places where the median income that suggest the existing population has moved beyond the calculated baseline (highest or average). For example, the variation of Bensonhurst is 78. Thus, highest median can be established to be as at 056 with twenty-six. Hence, being 994 from the average, it is richer than many other areas.
-    - **Negative Deviation**: This means that some of the features show that a particular location has a median income below the established baseline. Brownsville can be seen to be with a negative deviation which could indicate a problem in the economy in that particular region.
+    **Income Distribution:**
 
-    ##### Colour Coding:
-    - **Green**: Locations with values above the origin zero sign reflecting good economic conditions in the region.
-    - **Yellow/Orange**: Moderate to slight positive deviations, which stand for the regions that have the average level of economic conditions.
-    - **Red**: The additional five large negative disparities are underlined: economically disadvantaged areas.
+    - **High-Income Areas:** As seen earlier, relative scales and income deviations are higher for tracts with higher median family income, about 40,000 or more, as observed in the tracts of Bedford-Stuyvesant (East) and Bensonhurst.
+    - **Low-Income Areas:** Of the tracts, notably those located in Brownsville and East New York, tracts with lower medians, exhibit smaller relative scales and substantial negative income differential vis-a-vis the highest and the average medians.
 
-    #### Key Insights:
-    ##### Income Variability within Neighbourhoods:
-    - **Bedford-Stuyvesant**: Even in certain areas such as Bedford-Stuyvesant you could have the eastern part of that area and the western part, and they will be completely different from each other. Bedford-Stuyvesant East (e. g. , Tract 28501) on average produces a higher median family income compared to Bedford-Stuyvesant West (e. g. , Tract 25902). Such a situation implies that there is a considerable economic dissimilarity within a comparatively compact region, which imply that even within well-defined communities there can be levels of relative wealth and pauperism.
-    - **Brownsville**: Brownsville also demonstrates that most of the tracts average anemic median family income throughout the study, with for example tracts 90800 and 92000 among the lowest aural family incomes in the dataset. Such homogeneity suggests systematic economic problems which, perhaps, need area-based strategies of treatment.
+    **Relative Scales:**
 
-    ##### Potential Causes of Economic Disparity:
-    - **Historical Factors**: Places that reported lower median family income may currently or in the future feel the impacts of the historical redlining, ability of direct investments, and access to opportunities. For example, such areas as Brownsville and East New York have been facing these problems; their present state of economic development also cannot be considered rosy.
-    - **Access to Education and Employment**: This can make higher income areas to have better education facilities and employment so as to meet the demands of the community. On the other hand, there may be lack of proper education facilities and job opportunities in that area, hence the population remains in the same status of poverty.
-    - **Housing and Living Costs**: May be the regions with higher cost of living would of course have higher median family incomes, as only well-off families can afford to live there. However, there may be the areas of comparatively low living costs where the majority of families could be sedentary renters with low income, distorting the median income levels.
+    - **Highest Median Scale:** This is an illustration of how the income of each tract compares to the highest income in the dataset. For instance, Bedford-Stuyvesant (East) at $87,750 has a scale of 35. 10, indicating it's 35. Table 3 revealed that the spending was 1% of the highest median income.
+    - **Average Median Scale:** This results in a wider view of the organization by benchmarking every tract’s income against a per capita income. Places with such values close or above 100 have a higher income level in relation to the overall median income.
 
-    #### Application in Food Desert Analysis and Health Implications:
-    ##### Correlation with Health Outcomes: They can be explained by poor access to healthy food among people with low income living in failing areas and experience high rates of obesity, diabetes, high blood pressure. The management of income differences can therefore be seen to have a favourable effect on public health.
-    ##### Community-Based Solutions: To reduce the food desert problem at the community level Pico-projects like community gardens, farmer’s markets as well as cooperative grocery stores can be adopted in order to quickly solve the issue. These initiatives apart from enhancing uptake of nutritional foods also enhance participates’ participation and ability to bear with the situation.
-    ##### Partnerships with Retailers: These measures advocate for substantial grocery retailers to commence selling their products in areas that currently lack such firms through incentives that get rid of the food desert. PPPs are the most efficient in fight against food deserts.
+    **Income Deviation:**
 
-    #### Further Insights:
-    ##### Economic Development Programs: Programs that illustrate policy based on economic development considerations should pay especial emphasis on employment opportunities for the citizens, education, and housing in the lower-income districts. These initiatives can assist help economically disadvantaged areas rise and improve.
-    ##### Infrastructure and Public Services: Opp. Spending on public transport, health, education and other social infrastructure amenities can go a long way in uplifting the living standards of the less affluent neighbourhoods. Those places can also be improved by making sure that they are well served with transport links for employment.
-    ##### Support for Local Businesses: Supporting local entrepreneurship that can be done through issuing grants, offering credits or simply providing training will help activate lower income districts. Promoting small business can foster employment and also can work as a catalyst to financial stability.
+    - **Positive Deviation:** Points to places where the median income that suggest the existing population has moved beyond the calculated baseline (highest or average). For example, the variation of Bensonhurst is 78. Thus, highest median can be established to be as at 056 with twenty-six. Hence, being 994 from the average, it is richer than many other areas.
+    - **Negative Deviation:** This means that some of the features show that a particular location has a median income below the established baseline. Brownsville can be seen to be with a negative deviation which could indicate a problem in the economy in that particular region.
 
-    #### Conclusion:
+    **Colour Coding:**
+
+    - **Green:** Locations with values above the origin zero sign reflecting good economic conditions in the region.
+    - **Yellow/Orange:** Moderate to slight positive deviations, which stand for the regions that have the average level of economic conditions.
+    - **Red:** The additional five large negative disparities are underlined: economically disadvantaged areas.
+
+    ### Key Insights:
+
+    **Income Variability within Neighbourhoods:**
+
+    - **Bedford-Stuyvesant:** Even in certain areas such as Bedford-Stuyvesant you could have the eastern part of that area and the western part, and they will be completely different from each other. Bedford-Stuyvesant East (e. g. , Tract 28501) on average produces a higher median family income compared to Bedford-Stuyvesant West (e. g. , Tract 25902). Such a situation implies that there is a considerable economic dissimilarity within a comparatively compact region, which imply that even within well-defined communities there can be levels of relative wealth and pauperism.
+    - **Brownsville:** Brownsville also demonstrates that most of the tracts average anemic median family income throughout the study, with for example tracts 90800 and 92000 among the lowest aural family incomes in the dataset. Such homogeneity suggests systematic economic problems which, perhaps, need area-based strategies of treatment.
+
+    **Potential Causes of Economic Disparity:**
+
+    - **Historical Factors:** Places that reported lower median family income may currently or in the future feel the impacts of the historical redlining, ability of direct investments, and access to opportunities. For example, such areas as Brownsville and East New York have been facing these problems; their present state of economic development also cannot be considered rosy.
+    - **Access to Education and Employment:** This can make higher income areas to have better education facilities and employment so as to meet the demands of the community. On the other hand, there may be lack of proper education facilities and job opportunities in that area, hence the population remains in the same status of poverty.
+    - **Housing and Living Costs:** May be the regions with higher cost of living would of course have higher median family incomes, as only well-off families can afford to live there. However, there may be the areas of comparatively low living costs where the majority of families could be sedentary renters with low income, distorting the median income levels.
+
+    ### Application in Food Desert Analysis and Health Implications:
+
+    **Correlation with Health Outcomes:** They can be explained by poor access to healthy food among people with low income living in failing areas and experience high rates of obesity, diabetes, high blood pressure. The management of income differences can therefore be seen to have a favourable effect on public health.
+    **Community-Based Solutions:** To reduce the food desert problem at the community level Pico-projects like community gardens, farmer’s markets as well as cooperative grocery stores can be adopted in order to quickly solve the issue. These initiatives apart from enhancing uptake of nutritional foods also enhance participates’ participation and ability to bear with the situation.
+    **Partnerships with Retailers:** These measures advocate for substantial grocery retailers to commence selling their products in areas that currently lack such firms through incentives that get rid of the food desert. PPPs are the most efficient in fight against food deserts.
+
+    ### Further Insights:
+
+    **Economic Development Programs:** Programs that illustrate policy based on economic development considerations should pay especial emphasis on employment opportunities for the citizens, education, and housing in the lower-income districts. These initiatives can assist help economically disadvantaged areas rise and improve.
+    **Infrastructure and Public Services:** Opp. Spending on public transport, health, education and other social infrastructure amenities can go a long way in uplifting the living standards of the less affluent neighbourhoods. Those places can also be improved by making sure that they are well served with transport links for employment.
+    **Support for Local Businesses:** Supporting local entrepreneurship that can be done through issuing grants, offering credits or simply providing training will help activate lower income districts. Promoting small business can foster employment and also can work as a catalyst to financial stability.
+
+    ### Conclusion:
     Using median family income data, we dissect Brooklyn’s tracts and established considerable differences that call for interventions. Redressing these imbalances through serious, inclusive economic development deploys for people, effective, quality public services, community development projects, etc. can meanwhile revolutionize the quality of lives of the affected populations. Also, investing in the priority areas known as food deserts can increase associated access of healthy food items and therefore benefit health of a nation’s people. This analysis can act as an important guide for policy makers, researchers and communal leaders who are involved in the process of striving for economic and social justice in Brooklyn.
     """)
 
@@ -354,12 +364,12 @@ def main():
         "Home": "🏠",
         "Data Analysis": "📊",
         "Data Visualization": "📈",
+        "Food Policy Reports": "📄",
         "Comments": "💬",
-        "Guide": "📖",
-        "Food Policy Reports": "📄"
+        "Guide": "📖"
     }
 
-    pages = ["Home", "Data Analysis", "Data Visualization", "Comments", "Guide", "Food Policy Reports"]
+    pages = ["Home", "Data Analysis", "Data Visualization", "Food Policy Reports", "Comments", "Guide"]
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     st.title(selection)
@@ -505,13 +515,6 @@ def main():
         href = f'<a href="data:file/csv;base64,{b64}" download="LILAZones_geo.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
         st.sidebar.markdown(href, unsafe_allow_html=True)
 
-    elif selection == "Comments":
-        st.write("Leave your comments here:")
-        st.text_area("Comments:")
-
-    elif selection == "Guide":
-        st.write("How to use the app content goes here.")
-    
     elif selection == "Food Policy Reports":
         st.title("Food Policy Reports")
 
@@ -575,9 +578,15 @@ def main():
         - [2013 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2013.pdf)
         - [2012 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2012.pdf)
 
-
         Food policy reports are invaluable resources provided by the New York City Council that guide our journey toward a healthier, more equitable, and sustainable food system. By leveraging the data and insights provided in these reports, we can implement effective policies and initiatives that benefit everyone.
         """)
+
+    elif selection == "Comments":
+        st.write("Leave your comments here:")
+        st.text_area("Comments:")
+
+    elif selection == "Guide":
+        st.write("How to use the app content goes here.")
 
 if __name__ == "__main__":
     main()
