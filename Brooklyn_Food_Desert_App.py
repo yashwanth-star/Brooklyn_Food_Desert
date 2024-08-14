@@ -266,13 +266,7 @@ def run_data_analysis():
     )
 
     # Display the plot in Streamlit
-    st.plotly_chart(fig6)
-
-    # Explanation
-    st.markdown("""
-    #### Explanation:
-    This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
-    """)
+    st.plotly_chart(fig
 
 # Function to handle food policy reports page
 def run_food_policy_reports():
