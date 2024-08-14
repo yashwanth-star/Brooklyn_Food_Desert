@@ -296,8 +296,8 @@ def run_data_analysis():
 
       **Tract 28100 (Bedford-Stuyvesant East):**
       - **Median Family Income**: $25,625
-      - **Relative Scale (Highest)**: 10. Calculation of the figure is as follows, $25,625 being one hundred percent and twenty-five percent of this figure is $6,406.25. Therefore, an acceptable measure.
-      - **Relative Scale (Average)**: 34. It is calculated as 34% of the average of median family incomes.
+      - **Relative Scale (Highest)**: 10.25% of the highest median family income.
+      - **Relative Scale (Average)**: 34.10% of the average median family income.
       - **Income Deviation (Highest)**: 89.75
       - **Income Deviation (Average)**: 65.90
 
