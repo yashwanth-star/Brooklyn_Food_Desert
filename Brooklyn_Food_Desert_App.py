@@ -516,7 +516,6 @@ def main():
         st.sidebar.markdown(href, unsafe_allow_html=True)
 
     elif selection == "Food Policy Reports":
-        st.title("Food Policy Reports")
 
         # Video
         video_file = open('3245641-uhd_3840_2160_25fps.mp4', 'rb')
