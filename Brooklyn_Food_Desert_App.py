@@ -300,8 +300,8 @@ def run_data_analysis():
     **Tract 28100 (Bedford-Stuyvesant East):**
 
     - Median Family Income: $25,625
-    - Relative Scale (Highest): 10. Calculation of the figure is as follows, $ 25, 000 being one hundred percent and twenty five percent of this figure is, 5,000 $ 25 percent of the median family income or $ 5,000 or 25 percent of the HIJI as prefixed above is, therefore, an acceptable measure.
-    - Relative Scale (Average): 34. It is calculated as 10% of the average of median family incomes.
+    - Relative Scale (Highest): 10.25% of the highest median family income.
+    - Relative Scale (Average): 34.10% of the average median family income.
     - Income Deviation (Highest): 89. 75
     - Income Deviation (Average): 65. 90
 
@@ -343,15 +343,15 @@ def run_data_analysis():
 
     ### Application in Food Desert Analysis and Health Implications:
 
-    **Correlation with Health Outcomes:** They can be explained by poor access to healthy food among people with low income living in failing areas and experience high rates of obesity, diabetes, high blood pressure. The management of income differences can therefore be seen to have a favourable effect on public health.
-    **Community-Based Solutions:** To reduce the food desert problem at the community level Pico-projects like community gardens, farmer’s markets as well as cooperative grocery stores can be adopted in order to quickly solve the issue. These initiatives apart from enhancing uptake of nutritional foods also enhance participates’ participation and ability to bear with the situation.
-    **Partnerships with Retailers:** These measures advocate for substantial grocery retailers to commence selling their products in areas that currently lack such firms through incentives that get rid of the food desert. PPPs are the most efficient in fight against food deserts.
+    - **Correlation with Health Outcomes:** They can be explained by poor access to healthy food among people with low income living in failing areas and experience high rates of obesity, diabetes, high blood pressure. The management of income differences can therefore be seen to have a favourable effect on public health.
+    - **Community-Based Solutions:** To reduce the food desert problem at the community level Pico-projects like community gardens, farmer’s markets as well as cooperative grocery stores can be adopted in order to quickly solve the issue. These initiatives apart from enhancing uptake of nutritional foods also enhance participates’ participation and ability to bear with the situation.
+    - **Partnerships with Retailers:** These measures advocate for substantial grocery retailers to commence selling their products in areas that currently lack such firms through incentives that get rid of the food desert. PPPs are the most efficient in fight against food deserts.
 
     ### Further Insights:
 
-    **Economic Development Programs:** Programs that illustrate policy based on economic development considerations should pay especial emphasis on employment opportunities for the citizens, education, and housing in the lower-income districts. These initiatives can assist help economically disadvantaged areas rise and improve.
-    **Infrastructure and Public Services:** Opp. Spending on public transport, health, education and other social infrastructure amenities can go a long way in uplifting the living standards of the less affluent neighbourhoods. Those places can also be improved by making sure that they are well served with transport links for employment.
-    **Support for Local Businesses:** Supporting local entrepreneurship that can be done through issuing grants, offering credits or simply providing training will help activate lower income districts. Promoting small business can foster employment and also can work as a catalyst to financial stability.
+    - **Economic Development Programs:** Programs that illustrate policy based on economic development considerations should pay especial emphasis on employment opportunities for the citizens, education, and housing in the lower-income districts. These initiatives can assist help economically disadvantaged areas rise and improve.
+    - **Infrastructure and Public Services:** Opp. Spending on public transport, health, education and other social infrastructure amenities can go a long way in uplifting the living standards of the less affluent neighbourhoods. Those places can also be improved by making sure that they are well served with transport links for employment.
+    - **Support for Local Businesses:** Supporting local entrepreneurship that can be done through issuing grants, offering credits or simply providing training will help activate lower income districts. Promoting small business can foster employment and also can work as a catalyst to financial stability.
 
     ### Conclusion:
     Using median family income data, we dissect Brooklyn’s tracts and established considerable differences that call for interventions. Redressing these imbalances through serious, inclusive economic development deploys for people, effective, quality public services, community development projects, etc. can meanwhile revolutionize the quality of lives of the affected populations. Also, investing in the priority areas known as food deserts can increase associated access of healthy food items and therefore benefit health of a nation’s people. This analysis can act as an important guide for policy makers, researchers and communal leaders who are involved in the process of striving for economic and social justice in Brooklyn.
