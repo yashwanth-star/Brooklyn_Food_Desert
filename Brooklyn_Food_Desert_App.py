@@ -10,6 +10,9 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from PIL import Image
 
+# Set page configuration at the top
+st.set_page_config(page_title="Food Deserts in Brooklyn", layout="wide")
+
 # Cache the data loading and processing function
 @st.cache_data
 def load_data(file_path):
@@ -376,9 +379,6 @@ def main():
     st.title(selection)
 
     if selection == "Home":
-        # Home Page Code
-        st.set_page_config(page_title="Food Deserts in Brooklyn", layout="wide")
-
         # Title of the homepage
         st.title("Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI")
 
@@ -423,7 +423,7 @@ def main():
             # Display the infographic in the second column
             infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
             st.image(infographic_image, width=350)  # Adjust width as needed to fit well
-    
+
     elif selection == "Data Analysis":
         run_data_analysis()
 
