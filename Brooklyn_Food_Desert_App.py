@@ -8,6 +8,7 @@ import base64
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
+from PIL import Image
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -375,9 +376,53 @@ def main():
     st.title(selection)
 
     if selection == "Home":
-        st.write("Welcome to the Food Desert Analysis App")
-        st.write("This app helps to analyze food desert regions in Brooklyn.")
-    
+        st.set_page_config(page_title="Food Deserts in Brooklyn", layout="wide")
+
+        # Title of the homepage
+        st.title("Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI")
+
+        # Display the new Brooklyn image with reduced size
+        brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
+        st.image(brooklyn_image, caption='Brooklyn, NY', width=400)  # Further reduced width
+
+        # Create two columns for the text and infographic
+        col1, col2 = st.columns([1, 1])  # Adjust proportions if needed
+
+        with col1:
+            # Add the descriptive text in the first column
+            st.markdown("""
+            ### Understanding Food Deserts
+
+            According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
+            1. **A poverty rate greater than or equal to 20 percent,** or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
+            2. **At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.**
+
+            Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
+
+            To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like **SNAP benefits, poverty rates, and income levels** frequently appeared in areas recognized as food deserts.
+
+            ### Building the Dataset
+
+            To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
+
+            ### Clustering Algorithms and Model Selection
+
+            The selected variables were normalized within a range of 0-100 before being processed by these algorithms. Among them, **DB Scan** emerged as the most effective clustering model, with a silhouette score of 0.56.
+
+            The variables included in the final model were:
+            1. **SNAP Benefits:** The proportion of households using SNAP benefits to purchase food.
+            2. **Population Earning Less Than $40K.**
+            3. **Proportion of Population with Less Than a High School Diploma.**
+            4. **Food Index:** A derived variable representing food accessibility.
+
+            The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
+            """)
+
+        with col2:
+            # Display the infographic in the second column
+            infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
+            st.image(infographic_image, width=350)  # Adjust width as needed to fit well
+
     elif selection == "Data Analysis":
         run_data_analysis()
 
@@ -516,6 +561,7 @@ def main():
         st.sidebar.markdown(href, unsafe_allow_html=True)
 
     elif selection == "Food Policy Reports":
+        st.title("Food Policy Reports")
 
         # Video
         video_file = open('3245641-uhd_3840_2160_25fps.mp4', 'rb')
