@@ -10,9 +10,6 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from PIL import Image
 
-# Set page configuration
-st.set_page_config(page_title="Food Deserts in Brooklyn", layout="wide")
-
 # Cache the data loading and processing function
 @st.cache_data
 def load_data(file_path):
@@ -140,7 +137,7 @@ def run_data_analysis():
     selected_years_conv = st.slider('Select years for convenience stores', min_value=int(years_conv.min()), max_value=int(years_conv.max()), value=(int(years_conv.min()), int(years_conv.max())), key='slider_conv')
 
     # Filter the dataframe
-    filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (filtered_convStores_df['year'] <= selected_years_conv[1])]
+    filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
 
     # Create the plot
     fig2 = px.line(filtered_convStores_df, x='year', y=['Alcohol', 'Cigarettes', 'Food stores'],
@@ -172,7 +169,7 @@ def run_data_analysis():
     selected_years_eating = st.slider('Select years for eating establishments', min_value=int(years_eating.min()), max_value=int(years_eating.max()), value=(int(years_eating.min()), int(years_eating.max())), key='slider_eating')
 
     # Filter the dataframe
-    filtered_eating_df = eating_df[(eating_df['year'] >= selected_years_eating[0]) & (filtered_eating_df['year'] <= selected_years_eating[1])]
+    filtered_eating_df = eating_df[(eating_df['year'] >= selected_years_eating[0]) & (eating_df['year'] <= selected_years_eating[1])]
 
     # Create the plot
     fig3 = px.line(filtered_eating_df, x='year', y=['Restaurants', 'Fast-foods', 'Snack places', 'Drinking places'],
@@ -376,7 +373,13 @@ def main():
     pages = ["Home", "Data Analysis", "Data Visualization", "Food Policy Reports", "Comments", "Guide"]
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
+    st.title(selection)
+
     if selection == "Home":
+        # Home Page Code
+        st.set_page_config(page_title="Food Deserts in Brooklyn", layout="wide")
+
+        # Title of the homepage
         st.title("Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI")
 
         # Display the new Brooklyn image with reduced size
@@ -420,7 +423,7 @@ def main():
             # Display the infographic in the second column
             infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
             st.image(infographic_image, width=350)  # Adjust width as needed to fit well
-
+    
     elif selection == "Data Analysis":
         run_data_analysis()
 
