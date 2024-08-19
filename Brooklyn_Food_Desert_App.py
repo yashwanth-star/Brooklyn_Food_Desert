@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
-# Set page configuration
+# Set page configuration for the Home page
 st.set_page_config(page_title="Food Deserts in Brooklyn", layout="wide")
 
 # Title of the homepage
@@ -86,7 +86,6 @@ def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, lege
         legend_name=legend_name
     ).add_to(m)
     
-    # Add tooltips
     folium.GeoJson(
         gdf_filtered,
         style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
@@ -117,6 +116,7 @@ def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
 
 # Function to handle data analysis page
 def run_data_analysis():
+    # Load the datasets
     socioeconomics_df = pd.read_csv('dataset_socioeconomics.csv')
     convStores_df = pd.read_csv('dataset_convStores.csv')
     eating_df = pd.read_csv('dataset_eating.csv')
@@ -127,19 +127,25 @@ def run_data_analysis():
     ### 1. Family Income vs Race (2016-2020)
     st.header("Family Income vs Race (2016-2020)")
 
+    # Rename columns for better display names
     socioeconomics_df.columns = ['ALL', 'White', 'Black', 'Hispanic']
 
-    races = list(socioeconomics_df.columns)
+    # Filter options
+    races = list(socioeconomics_df.columns)  # Convert Index to list
     selected_races = st.multiselect('Select races to display', races, default=races)
 
+    # Filter the dataframe
     filtered_income_df = socioeconomics_df[selected_races]
 
+    # Create the plot
     fig1 = px.box(filtered_income_df, 
                  labels={'value': 'Family Income', 'variable': 'Race'},
                  title='Family Income vs Race (2016-2020)')
 
+    # Display the plot in Streamlit
     st.plotly_chart(fig1)
 
+    # Explanation
     st.markdown("""
     #### Explanation:
     This boxplot visualizes the distribution of family incomes across different racial groups between 2016 and 2020. Each box represents the interquartile range (IQR), showing the median and spread of the data. The whiskers indicate variability outside the upper and lower quartiles, while points beyond the whiskers are outliers. This visualization helps in identifying income disparities among various racial groups.
@@ -148,23 +154,29 @@ def run_data_analysis():
     ### 2. Employment in Convenience Stores Over Time
     st.header("Employment in Convenience Stores Over Time")
 
+    # Rename columns for better display names
     convStores_df = convStores_df.rename(columns={
         'count_emp_4453': 'Alcohol',
         'count_emp_453991': 'Cigarettes',
         'count_emp_445120': 'Food stores'
     })
 
+    # Filter options
     years_conv = convStores_df['year'].unique()
     selected_years_conv = st.slider('Select years for convenience stores', min_value=int(years_conv.min()), max_value=int(years_conv.max()), value=(int(years_conv.min()), int(years_conv.max())), key='slider_conv')
 
+    # Filter the dataframe
     filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
 
+    # Create the plot
     fig2 = px.line(filtered_convStores_df, x='year', y=['Alcohol', 'Cigarettes', 'Food stores'],
                   labels={'value': 'Employment Count', 'year': 'Year'},
                   title='Employment in Convenience Stores Over Time')
 
+    # Display the plot in Streamlit
     st.plotly_chart(fig2)
 
+    # Explanation
     st.markdown("""
     #### Explanation:
     This line chart illustrates the trends in employment across different types of stores, including convenience stores, other general stores, and grocery stores over several years. The x-axis represents the years, while the y-axis represents the count of employees. The lines demonstrate how employment levels have changed over time, helping to identify growth or decline trends in these sectors.
@@ -173,6 +185,7 @@ def run_data_analysis():
     ### 3. Employment in Eating Establishments Over Time
     st.header("Employment in Eating Establishments Over Time")
 
+    # Rename columns for better display names
     eating_df = eating_df.rename(columns={
         'count_emp_722511': 'Restaurants',
         'count_emp_722513': 'Fast-foods',
@@ -180,17 +193,22 @@ def run_data_analysis():
         'count_emp_722410': 'Drinking places'
     })
 
+    # Filter options
     years_eating = eating_df['year'].unique()
     selected_years_eating = st.slider('Select years for eating establishments', min_value=int(years_eating.min()), max_value=int(years_eating.max()), value=(int(years_eating.min()), int(years_eating.max())), key='slider_eating')
 
+    # Filter the dataframe
     filtered_eating_df = eating_df[(eating_df['year'] >= selected_years_eating[0]) & (eating_df['year'] <= selected_years_eating[1])]
 
+    # Create the plot
     fig3 = px.line(filtered_eating_df, x='year', y=['Restaurants', 'Fast-foods', 'Snack places', 'Drinking places'],
                   labels={'value': 'Employment Count', 'year': 'Year'},
                   title='Employment in Eating Establishments Over Time')
 
+    # Display the plot in Streamlit
     st.plotly_chart(fig3)
 
+    # Explanation
     st.markdown("""
     #### Explanation:
     This line chart displays employment trends in various eating establishments, such as full-service restaurants, limited-service restaurants, snack and nonalcoholic beverage bars, and caterers over time. The x-axis denotes the years, and the y-axis indicates the count of employees. This plot helps in understanding how employment in different types of eating establishments has evolved, highlighting periods of growth or decline.
@@ -199,22 +217,27 @@ def run_data_analysis():
     ### 4. Employment in Convenience Stores, Liquor, and Tobacco Stores
     st.header("Employment in Convenience Stores, Liquor, and Tobacco Stores")
 
+    # Create the grouped bar plot
     bar_width = 0.2
     years = convStores_df['year']
     r1 = range(len(years))
     r2 = [x + bar_width for x in r1]
     r3 = [x + bar_width for x in r2]
 
+    # Create the plot
     fig4 = go.Figure(data=[
         go.Bar(name='Alcohol', x=years, y=convStores_df['Alcohol'], marker_color='blue', width=bar_width),
         go.Bar(name='Food stores', x=years, y=convStores_df['Food stores'], marker_color='red', width=bar_width),
         go.Bar(name='Cigarettes', x=years, y=convStores_df['Cigarettes'], marker_color='green', width=bar_width)
     ])
 
+    # Update layout
     fig4.update_layout(barmode='group', xaxis_tickangle=-45, title='Mean Count by Year for Different Categories', xaxis_title='Year', yaxis_title='Mean Count')
 
+    # Display the plot in Streamlit
     st.plotly_chart(fig4)
 
+    # Explanation
     st.markdown("""
     #### Explanation:
     This grouped bar plot visualizes the mean count of employees in convenience stores, liquor stores, and tobacco stores over several years. Each group of bars represents a different year, and within each group, there are bars for alcohol, food stores, and cigarettes. This plot helps in understanding the employment trends in these specific categories over time.
@@ -223,6 +246,7 @@ def run_data_analysis():
     ### 5. Employment in Eating & Drinking Data
     st.header("Employment in Eating & Drinking Data")
 
+    # Create the grouped bar plot
     bar_width = 0.35
     years = eating_df['year']
     indices = range(len(years))
@@ -231,6 +255,7 @@ def run_data_analysis():
     r3 = [x + bar_width for x in r2]
     r4 = [x + bar_width for x in r3]
 
+    # Create the plot
     fig5 = go.Figure(data=[
         go.Bar(name='Restaurants', x=years, y=eating_df['Restaurants'], marker_color='green', width=bar_width),
         go.Bar(name='Fast-foods', x=years, y=eating_df['Fast-foods'], marker_color='red', width=bar_width),
@@ -238,10 +263,13 @@ def run_data_analysis():
         go.Bar(name='Drinking places', x=years, y=eating_df['Drinking places'], marker_color='orange', width=bar_width)
     ])
 
+    # Update layout
     fig5.update_layout(barmode='group', xaxis_tickangle=-45, title='Mean Count by Year for Different Categories', xaxis_title='Year', yaxis_title='Mean Count')
 
+    # Display the plot in Streamlit
     st.plotly_chart(fig5)
 
+    # Explanation
     st.markdown("""
     #### Explanation:
     This grouped bar plot visualizes the mean count of employees in various types of eating and drinking establishments over several years. Each group of bars represents a different year, and within each group, there are bars for restaurants, fast-foods, snack places, and drinking places. This plot helps in understanding the employment trends in these specific categories over time.
@@ -250,11 +278,14 @@ def run_data_analysis():
     ### 6. Correlation Heatmap
     st.header("Correlation Heatmap")
 
-    columns = list(corrPlot_df.columns)
+    # Filter options
+    columns = list(corrPlot_df.columns)  # Convert Index to list
     selected_columns = st.multiselect('Select columns for correlation', columns, default=columns)
 
+    # Filter the dataframe
     filtered_corr_df = corrPlot_df[selected_columns]
 
+    # Create the correlation heatmap
     corr = filtered_corr_df.corr()
     fig6 = ff.create_annotated_heatmap(
         z=corr.values,
@@ -264,8 +295,10 @@ def run_data_analysis():
         colorscale='Viridis'
     )
 
+    # Display the plot in Streamlit
     st.plotly_chart(fig6)
 
+    # Explanation
     st.markdown("""
     #### Explanation:
     This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
@@ -274,8 +307,10 @@ def run_data_analysis():
     ### Baseline Analysis Median Family Income
     st.header("Baseline Analysis Median Family Income")
 
+    # Load and display image
     st.image('Baseline Analysis_Med Family Income.png', use_column_width=True)
 
+    # Explanation
     st.markdown("""
     ## Review and Interpretation of Baseline Analysis of Median Family Income for Brooklyn
 
@@ -368,31 +403,80 @@ def main():
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     if selection == "Home":
-        # Home page content already defined above, skipping redundant code.
-        pass
-    
+        st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
+
+        # Display the new Brooklyn image
+        brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
+        st.image(brooklyn_image, use_column_width=True, caption='Brooklyn, NY')
+
+        # Add the descriptive text below the image
+        st.markdown("""
+        ### Understanding Food Deserts
+
+        According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
+
+        1. **A poverty rate greater than or equal to 20 percent,** or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
+        2. **At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.**
+
+        Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
+
+        To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like **SNAP benefits, poverty rates, and income levels** frequently appeared in areas recognized as food deserts.
+
+        To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
+        """)
+
+        # Create two columns for the new text and infographic
+        col1, col2 = st.columns([1, 1])  # Adjust proportions if needed
+
+        with col1:
+            # Add the new descriptive text in the first column
+            st.markdown("""
+            ### Clustering Algorithms and Model Selection
+
+            The selected variables were normalized within a range of 0-100 before being processed by these algorithms. Among them, **DB Scan** emerged as the most effective clustering model, with a silhouette score of 0.56.
+
+            The variables included in the final model were:
+            1. **SNAP Benefits:** The proportion of households using SNAP benefits to purchase food.
+            2. **Population Earning Less Than $40K.**
+            3. **Proportion of Population with Less Than a High School Diploma.**
+            4. **Food Index:** A derived variable representing food accessibility.
+
+            The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
+            """)
+
+        with col2:
+            # Display the infographic in the second column
+            infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
+            st.image(infographic_image, use_column_width=True)
+
     elif selection == "Data Analysis":
         run_data_analysis()
 
     elif selection == "Data Visualization":
+        # Map selection using tabs
         tabs = st.tabs(["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
 
         with tabs[0]:
             st.header("LILA & Non-LILA Zones")
 
+            # Initial filter
             nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
             nta_selected = st.selectbox("Search for NTA Name:", nta_options)
 
+            # Filter the GeoDataFrame based on the selected NTA Name
             if nta_selected != "All":
                 filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
             else:
                 filtered_gdf = gdf_lila
 
+            # Census Tract Area filter based on the filtered GeoDataFrame
             tract_options = ["All"] + filtered_gdf['Census Tract Area'].unique().tolist()
             tract_selected = st.selectbox("Search for Census Tract Area:", tract_options)
 
+            # Update the filtering logic to highlight the selected Census Tract Area
             if tract_selected != "All":
                 filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == tract_selected]
+                # Ensure NTA dropdown is updated according to selected Census Tract Area
                 nta_options = ["All"] + filtered_gdf['NTA Name'].unique().tolist()
                 nta_selected = nta_options[1] if nta_selected == "All" else nta_selected
             elif nta_selected != "All":
@@ -441,7 +525,8 @@ def main():
         with tabs[1]:
             st.header("Supermarket Coverage Ratio")
             
-            years = list(range(2003, 2018))
+            # Add a select slider for the years
+            years = list(range(2003, 2018))  # Adjust this range based on your data
             year = st.select_slider(
                 "Select Year",
                 options=years,
@@ -450,12 +535,15 @@ def main():
                 key="supermarket_year_slider"
             )
 
+            # Add a select box for Rank search
             rank_options = ['All'] + sorted([rank for rank in gdf_supermarkets[f'{year}_rank'].dropna().unique() if rank.isdigit()], key=int)
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
 
+            # Create and display the map
             m = create_map(gdf_supermarkets, year, f'{year}_supermarket coverage ratio', f'{year}_rank', selected_rank, "Supermarket Coverage Ratio")
             folium_static(m)
 
+            # Display the tooltip information below the map if a specific rank is selected
             if selected_rank != 'All':
                 filtered_gdf = gdf_supermarkets[gdf_supermarkets[f'{year}_rank'] == selected_rank]
                 display_tooltip_info(filtered_gdf, year, f'{year}_supermarket coverage ratio')
@@ -463,7 +551,8 @@ def main():
         with tabs[2]:
             st.header("Fast Food Coverage Ratio")
             
-            years = list(range(2003, 2018))
+            # Add a select slider for the years
+            years = list(range(2003, 2018))  # Adjust this range based on your data
             year = st.select_slider(
                 "Select Year",
                 options=years,
@@ -472,21 +561,26 @@ def main():
                 key="fast_food_year_slider"
             )
 
+            # Add a select box for Rank search
             rank_options = ['All'] + sorted([rank for rank in gdf_fast_food[f'{year}_rank'].dropna().unique() if rank.isdigit()], key=int)
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
 
+            # Create and display the map
             m = create_map(gdf_fast_food, year, f'{year}_Fast Food Coverage Ratio', f'{year}_rank', selected_rank, "Fast Food Coverage Ratio")
             folium_static(m)
 
+            # Display the tooltip information below the map if a specific rank is selected
             if selected_rank != 'All':
                 filtered_gdf = gdf_fast_food[gdf_fast_food[f'{year}_rank'] == selected_rank]
                 display_tooltip_info(filtered_gdf, year, f'{year}_Fast Food Coverage Ratio')
 
+        # Share App button with Gmail link
         share_text = "Check out this Food Desert Analysis App!"
         app_link = "https://samplefooddesert01.streamlit.app/"
         mailto_link = f"mailto:?subject=Food Desert Analysis App&body={share_text}%0A{app_link}"
         st.sidebar.markdown(f'<a href="{mailto_link}" target="_blank"><button style="background-color:green;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Share App via Email</button></a>', unsafe_allow_html=True)
 
+        # Download CSV button
         csv = gdf_lila.to_csv(index=False)
         b64 = base64.b64encode(csv.encode()).decode()
         href = f'<a href="data:file/csv;base64,{b64}" download="LILAZones_geo.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
@@ -495,6 +589,7 @@ def main():
     elif selection == "Food Policy Reports":
         st.title("Food Policy Reports")
 
+        # Video
         video_file = open('3245641-uhd_3840_2160_25fps.mp4', 'rb')
         video_bytes = video_file.read()
         video_base64 = base64.b64encode(video_bytes).decode('utf-8')
@@ -505,6 +600,7 @@ def main():
         '''
         st.markdown(video_html, unsafe_allow_html=True)
 
+        # Link to Food Policy Reports page
         st.markdown(
             '''
             <a href="https://www.nyc.gov/site/foodpolicy/reports-and-data/food-metrics-report.page" target="_blank" class="btn btn-primary" style="text-decoration: none;">
@@ -516,6 +612,7 @@ def main():
             unsafe_allow_html=True
         )
 
+        # Content
         st.markdown("""
         ## Importance of Food Policy Reports
 
