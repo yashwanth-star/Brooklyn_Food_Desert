@@ -427,14 +427,6 @@ def main():
         The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
         """)
 
-        # Display the video in the center
-        video_url = "videoplayback (1).mp4"  # Replace with your video URL
-        st.markdown(f'''
-            <div style="text-align: center;">
-                <iframe width="560" height="315" src="{video_url}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        ''', unsafe_allow_html=True)
-
     elif selection == "Data Analysis":
         run_data_analysis()
 
