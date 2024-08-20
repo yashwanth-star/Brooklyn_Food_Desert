@@ -424,16 +424,11 @@ def main():
         # Add subtitle and video
         st.markdown("""
         ### Why We Need a Food Desert Finder Application
-        The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
-        """)
 
-        # Display the video in the center
-        video_url = "https://youtu.be/h_F59ypE04k"  # Replace with your video URL
-        st.markdown(f'''
-            <div style="text-align: center;">
-                <iframe width="560" height="315" src="{video_url}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        ''', unsafe_allow_html=True)
+        The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
+
+        <iframe width="700" height="400" src="https://www.youtube.com/embed/h_F59ypE04k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        """, unsafe_allow_html=True)
 
     elif selection == "Data Analysis":
         run_data_analysis()
