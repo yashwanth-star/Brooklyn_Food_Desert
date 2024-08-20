@@ -4,39 +4,11 @@ import geopandas as gpd
 import folium
 from streamlit_folium import folium_static
 from shapely import wkt
+import base64
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from PIL import Image
-import base64
-
-# Custom CSS to improve look and feel
-def inject_custom_css():
-    st.markdown("""
-        <style>
-        .stButton button {
-            background-color: #1e3d59;
-            color: white;
-            border-radius: 10px;
-            padding: 10px 20px;
-        }
-        .stMarkdown h2 {
-            color: #1e3d59;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .stMarkdown p {
-            color: #4b4b4b;
-        }
-        .stImage img {
-            border-radius: 10px;
-        }
-        .stSelectbox .css-1kyxreq-Container {
-            border-radius: 10px;
-            padding: 10px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -59,6 +31,7 @@ gdf_fast_food = load_data(fast_food_data_path)
 
 # Function to create a folium map for a given year and optionally filter by rank
 def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, legend_name="Coverage Ratio"):
+    # Create a base map
     m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Centered around New York
     
     # Check if columns exist
@@ -387,8 +360,6 @@ def run_data_analysis():
 
 # Main function to create the app
 def main():
-    inject_custom_css()  # Apply custom CSS
-    
     st.sidebar.title("Navigation")
     page_icons = {
         "Home": "🏠",
@@ -403,6 +374,7 @@ def main():
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     if selection == "Home":
+        # Title of the homepage
         st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
 
         # Display the new Brooklyn image
@@ -429,6 +401,7 @@ def main():
         col1, col2 = st.columns([1, 1])  # Adjust proportions if needed
 
         with col1:
+            # Add the new descriptive text in the first column
             st.markdown("""
             ### Clustering Algorithms and Model Selection
 
@@ -443,10 +416,12 @@ def main():
             The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
             """)
 
-        with col2:
+        with col2: 
+            # Display the infographic in the second column
             infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
             st.image(infographic_image, use_column_width=True)
 
+        # Add subtitle and video
         st.markdown("""
         ### Why We Need a Food Desert Finder Application
 
@@ -459,24 +434,30 @@ def main():
         run_data_analysis()
 
     elif selection == "Data Visualization":
+        # Map selection using tabs
         tabs = st.tabs(["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
 
         with tabs[0]:
             st.header("LILA & Non-LILA Zones")
 
+            # Initial filter
             nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
             nta_selected = st.selectbox("Search for NTA Name:", nta_options)
 
+            # Filter the GeoDataFrame based on the selected NTA Name
             if nta_selected != "All":
                 filtered_gdf = gdf_lila[gdf_lila['NTA Name'] == nta_selected]
             else:
                 filtered_gdf = gdf_lila
 
+            # Census Tract Area filter based on the filtered GeoDataFrame
             tract_options = ["All"] + filtered_gdf['Census Tract Area'].unique().tolist()
             tract_selected = st.selectbox("Search for Census Tract Area:", tract_options)
 
+            # Update the filtering logic to highlight the selected Census Tract Area
             if tract_selected != "All":
                 filtered_gdf = gdf_lila[gdf_lila['Census Tract Area'] == tract_selected]
+                # Ensure NTA dropdown is updated according to selected Census Tract Area
                 nta_options = ["All"] + filtered_gdf['NTA Name'].unique().tolist()
                 nta_selected = nta_options[1] if nta_selected == "All" else nta_selected
             elif nta_selected != "All":
@@ -525,6 +506,7 @@ def main():
         with tabs[1]:
             st.header("Supermarket Coverage Ratio")
             
+            # Add a select slider for the years
             years = list(range(2003, 2018))  # Adjust this range based on your data
             year = st.select_slider(
                 "Select Year",
@@ -534,12 +516,15 @@ def main():
                 key="supermarket_year_slider"
             )
 
+            # Add a select box for Rank search
             rank_options = ['All'] + sorted([rank for rank in gdf_supermarkets[f'{year}_rank'].dropna().unique() if rank.isdigit()], key=int)
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="supermarket_rank_select")
 
+            # Create and display the map
             m = create_map(gdf_supermarkets, year, f'{year}_supermarket coverage ratio', f'{year}_rank', selected_rank, "Supermarket Coverage Ratio")
             folium_static(m)
 
+            # Display the tooltip information below the map if a specific rank is selected
             if selected_rank != 'All':
                 filtered_gdf = gdf_supermarkets[gdf_supermarkets[f'{year}_rank'] == selected_rank]
                 display_tooltip_info(filtered_gdf, year, f'{year}_supermarket coverage ratio')
@@ -547,7 +532,8 @@ def main():
         with tabs[2]:
             st.header("Fast Food Coverage Ratio")
             
-            years = list(range(2003, 2018))
+            # Add a select slider for the years
+            years = list(range(2003, 2018))  # Adjust this range based on your data
             year = st.select_slider(
                 "Select Year",
                 options=years,
@@ -556,19 +542,35 @@ def main():
                 key="fast_food_year_slider"
             )
 
+            # Add a select box for Rank search
             rank_options = ['All'] + sorted([rank for rank in gdf_fast_food[f'{year}_rank'].dropna().unique() if rank.isdigit()], key=int)
             selected_rank = st.selectbox(f"Select a Rank for the year {year} or 'All':", rank_options, key="fast_food_rank_select")
 
+            # Create and display the map
             m = create_map(gdf_fast_food, year, f'{year}_Fast Food Coverage Ratio', f'{year}_rank', selected_rank, "Fast Food Coverage Ratio")
             folium_static(m)
 
+            # Display the tooltip information below the map if a specific rank is selected
             if selected_rank != 'All':
                 filtered_gdf = gdf_fast_food[gdf_fast_food[f'{year}_rank'] == selected_rank]
                 display_tooltip_info(filtered_gdf, year, f'{year}_Fast Food Coverage Ratio')
 
+        # Share App button with Gmail link
+        share_text = "Check out this Food Desert Analysis App!"
+        app_link = "https://samplefooddesert01.streamlit.app/"
+        mailto_link = f"mailto:?subject=Food Desert Analysis App&body={share_text}%0A{app_link}"
+        st.sidebar.markdown(f'<a href="{mailto_link}" target="_blank"><button style="background-color:green;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Share App via Email</button></a>', unsafe_allow_html=True)
+
+        # Download CSV button
+        csv = gdf_lila.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode()
+        href = f'<a href="data:file/csv;base64,{b64}" download="LILAZones_geo.csv"><button style="background-color:blue;color:white;border:none;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;font-size:16px;margin:4px 2px;cursor:pointer;">Download CSV</button></a>'
+        st.sidebar.markdown(href, unsafe_allow_html=True)
+
     elif selection == "Food Policy Reports":
         st.title("Food Policy Reports")
 
+        # Video
         video_file = open('3245641-uhd_3840_2160_25fps.mp4', 'rb')
         video_bytes = video_file.read()
         video_base64 = base64.b64encode(video_bytes).decode('utf-8')
@@ -579,6 +581,7 @@ def main():
         '''
         st.markdown(video_html, unsafe_allow_html=True)
 
+        # Link to Food Policy Reports page
         st.markdown(
             '''
             <a href="https://www.nyc.gov/site/foodpolicy/reports-and-data/food-metrics-report.page" target="_blank" class="btn btn-primary" style="text-decoration: none;">
@@ -590,6 +593,7 @@ def main():
             unsafe_allow_html=True
         )
 
+        # Content
         st.markdown("""
         ## Importance of Food Policy Reports
 
@@ -625,6 +629,8 @@ def main():
         - [2014 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/2014-food-metrics-report.pdf)
         - [2013 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2013.pdf)
         - [2012 Food Metrics Report](https://www.nyc.gov/assets/foodpolicy/downloads/pdf/ll52-food-metrics-report-2012.pdf)
+
+        Food policy reports are invaluable resources provided by the New York City Council that guide our journey toward a healthier, more equitable, and sustainable food system. By leveraging the data and insights provided in these reports, we can implement effective policies and initiatives that benefit everyone.
         """)
 
     elif selection == "Comments":
