@@ -434,6 +434,14 @@ def main():
                 <iframe width="560" height="315" src="{video_url}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         ''', unsafe_allow_html=True)
+        # Video
+        video_file = open('videoplayback (1).mp4', 'rb')
+        video_bytes = video_file.read()
+        video_base64 = base64.b64encode(video_bytes).decode('utf-8')
+        video_html = f'''
+        <video autoplay loop muted width="100%">
+            <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+        </video>
 
     elif selection == "Data Analysis":
         run_data_analysis()
