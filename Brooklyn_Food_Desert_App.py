@@ -416,10 +416,24 @@ def main():
             The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
             """)
 
-        with col2:
+        with col2: 
             # Display the infographic in the second column
             infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
             st.image(infographic_image, use_column_width=True)
+
+        # Add subtitle and video
+        st.markdown("""
+        ### Why We Need a Food Desert Finder Application
+        The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
+        """)
+
+        # Display the video in the center
+        video_url = "Promotional video"  # Replace with your video URL
+        st.markdown(f'''
+            <div style="text-align: center;">
+                <iframe width="560" height="315" src="{video_url}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        ''', unsafe_allow_html=True)
 
     elif selection == "Data Analysis":
         run_data_analysis()
