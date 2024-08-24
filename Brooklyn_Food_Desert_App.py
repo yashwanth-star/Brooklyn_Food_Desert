@@ -438,7 +438,7 @@ def main():
         tabs = st.tabs(["LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
 
         with tabs[0]:
-            st.header("LILA (Food Desert Zones")
+            st.header("LILA (Food Desert Zones)")
 
             # Initial filter
             nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
