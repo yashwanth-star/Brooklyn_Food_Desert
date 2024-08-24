@@ -517,19 +517,26 @@ def main():
 
         with tabs[1]:
             st.header("Supermarket Coverage Ratio")
-            st.markdown("""
+            st.markdown('''
+            ### Supermarket Coverage Ratio Map
+
+            **What is it?**
+
             The Supermarket Coverage Ratio map illustrates the density of supermarkets in relation to the population within different census tracts. This map provides insights into how well different areas are served by supermarkets.
 
-            - **Supermarket Coverage Ratio:** This ratio is calculated by comparing the number of supermarkets in a given area to the population size. A higher ratio indicates better access to supermarkets, while a lower ratio suggests that an area may be underserved.
+            - **Supermarket Coverage Ratio:** This ratio is calculated by comparing the number of supermarkets in a given area to the population size. **A lower ratio** indicates better access to supermarkets (fewer people per supermarket), while **a higher ratio** suggests that an area may be underserved (more people per supermarket).
 
             **Ranking System:**
-            - **Rank Order:** Each census tract is assigned a rank based on supermarket coverage, with Rank 1 indicating the highest supermarket reachability, and higher ranks (e.g., Rank 2, 3, etc.) indicating progressively lower coverage. This ranking helps quickly identify areas that are most and least accessible in terms of supermarket availability.
+
+            - **Rank Order:** Each census tract is assigned a rank based on supermarket coverage, with Rank 1 indicating the best supermarket reachability (lowest ratio), and higher ranks indicating progressively poorer coverage (higher ratios). This ranking helps quickly identify areas with the most and least supermarket access.
 
             **Significance:**
+
             - **Assessing Food Accessibility:** The Supermarket Coverage Ratio map helps identify areas with good access to supermarkets versus those that are underserved. This can highlight regions where residents may struggle to purchase fresh and healthy food.
-            - **Economic Insights:** Areas with low supermarket coverage often face economic disadvantages, which can limit residents' opportunities to buy affordable and nutritious food, thereby perpetuating cycles of poverty and poor health.
-            - **Planning and Development:** Urban planners and policymakers can use this map to promote the development of new supermarkets in underserved areas, improving both food access and local economies.
-            """)
+            - **Economic Insights:** Areas with low supermarket coverage ratios (and thus better access) tend to have better economic conditions, as residents have more opportunities to buy affordable and nutritious food. Areas with higher ratios may face economic disadvantages, potentially limiting access to healthy food and contributing to cycles of poverty and poor health.
+            - **Planning and Development:** Urban planners and policymakers can use this map to promote the development of new supermarkets in underserved areas, thereby improving food access and local economies.
+            ''')
+
             
             # Add a select slider for the years
             years = list(range(2003, 2018))  # Adjust this range based on your data
@@ -556,6 +563,26 @@ def main():
 
         with tabs[2]:
             st.header("Fast Food Coverage Ratio")
+            st.markdown('''
+            ### Fast Food Coverage Ratio Map
+
+            **What is it?**
+
+            The Fast Food Coverage Ratio map shows the density of fast-food restaurants in relation to the population within different census tracts. It highlights areas where fast food is readily available.
+
+            - **Fast Food Coverage Ratio:** This ratio is determined by comparing the number of fast-food restaurants in a given area to the population size. **A higher ratio** indicates a greater density of fast-food outlets (more people per fast food restaurant), while **a lower ratio** suggests fewer fast-food options (fewer people per fast food restaurant).
+
+            **Ranking System:**
+
+            - **Rank Order:** Each census tract is assigned a rank based on fast food coverage, with Rank 1 indicating the highest concentration of fast-food outlets (highest ratio), and higher ranks indicating progressively lower densities of fast food (lower ratios). This ranking helps identify areas with the most and least fast food access.
+
+            **Significance:**
+
+            - **Health Considerations:** High fast-food density, indicated by higher ratios, is often associated with poor dietary habits, as fast food is typically high in calories, fat, sugar, and sodium, and low in essential nutrients. This can lead to health issues such as obesity, diabetes, and heart disease.
+            - **Food Environment Analysis:** This map provides an understanding of the food environment in different areas. Regions with high fast-food coverage (higher ratios) may promote unhealthy eating habits, especially if there is also low supermarket coverage.
+            - **Guiding Health Initiatives:** Public health initiatives can use this map to target areas with high fast-food density (higher ratios) for education campaigns, healthy eating programs, or zoning regulations that limit the proliferation of fast-food outlets in vulnerable communities.
+            ''')
+
             
             # Add a select slider for the years
             years = list(range(2003, 2018))  # Adjust this range based on your data
