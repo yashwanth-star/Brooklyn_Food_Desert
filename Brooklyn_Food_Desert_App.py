@@ -1,17 +1,11 @@
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
+from shapely import wkt
 import folium
 from streamlit_folium import folium_static
-from shapely import wkt
 import base64
-import plotly.express as px
-import plotly.figure_factory as ff
-import plotly.graph_objects as go
 from PIL import Image
-from gtts import gTTS
-import time
-from io import BytesIO
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -32,23 +26,61 @@ gdf_supermarkets = load_data(supermarket_data_path)
 fast_food_data_path = "Fast Food Restaurants.csv"
 gdf_fast_food = load_data(fast_food_data_path)
 
-# Function to create the text-to-speech and highlight text
-def read_aloud(text, speed=1.25):
-    tts = gTTS(text=text, lang='en', slow=False)
-    tts.speed = speed  # Set playback speed
-    # Save to a file-like object
-    mp3_fp = BytesIO()
-    tts.write_to_fp(mp3_fp)
-    mp3_fp.seek(0)
-    return mp3_fp
+# Function to create a folium map for a given year and optionally filter by rank
+def create_map(gdf, year, coverage_ratio_col, rank_col, selected_rank=None, legend_name="Coverage Ratio"):
+    # Create a base map
+    m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)  # Centered around New York
+    
+    # Check if columns exist
+    if coverage_ratio_col not in gdf.columns or rank_col not in gdf.columns:
+        st.error(f"Column '{coverage_ratio_col}' or '{rank_col}' does not exist in the data.")
+        return m
+    
+    # Filter GeoDataFrame if a specific rank is selected
+    gdf_filtered = gdf.copy()
+    if selected_rank and selected_rank != 'All':
+        gdf_filtered = gdf_filtered[gdf_filtered[rank_col] == selected_rank]
+    
+    folium.Choropleth(
+        geo_data=gdf_filtered,
+        name='choropleth',
+        data=gdf_filtered,
+        columns=['TRACTCE', coverage_ratio_col],
+        key_on='feature.properties.TRACTCE',
+        fill_color='YlOrRd',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name=legend_name
+    ).add_to(m)
+    
+    # Add tooltips
+    folium.GeoJson(
+        gdf_filtered,
+        style_function=lambda x: {'fillColor': '#ffffff00', 'color': '#00000000', 'weight': 0},
+        tooltip=folium.GeoJsonTooltip(
+            fields=['TRACTCE', coverage_ratio_col, rank_col],
+            aliases=['Census Tract Area', f'{year} {legend_name}', 'Rank'],
+            localize=True
+        )
+    ).add_to(m)
+    
+    folium.LayerControl().add_to(m)
+    return m
 
-# Function to simulate text highlighting and reading
-def simulate_highlighting(text, speed=1.25):
-    paragraphs = text.split("\n\n")
-    for para in paragraphs:
-        st.markdown(f"<div style='background-color: #ffff99; padding: 10px;'>{para}</div>", unsafe_allow_html=True)
-        # Estimate reading time (adjust for speed)
-        time.sleep(len(para.split()) / (150 * speed))  # Approximate words per minute at 1.25x speed
+# Function to display tooltip info in a styled format
+def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
+    if not gdf_filtered.empty:
+        for _, row in gdf_filtered.iterrows():
+            st.markdown(
+                f"""
+                <div style="border:1px solid #ddd; border-radius: 10px; padding: 10px; margin: 10px 0; background-color: #f9f9f9;">
+                    <h4 style="color: #2E7D32;">Census Tract Area: {row['TRACTCE']}</h4>
+                    <p><span style="color: #D32F2F;">{year}: </span>{row[coverage_ratio_col]}</p>
+                    <p><span style="color: #1976D2;">Rank: </span>{row[f'{year}_rank']}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
 # Function to handle data analysis page
 def run_data_analysis():
@@ -102,7 +134,7 @@ def run_data_analysis():
     selected_years_conv = st.slider('Select years for convenience stores', min_value=int(years_conv.min()), max_value=int(years_conv.max()), value=(int(years_conv.min()), int(years_conv.max())), key='slider_conv')
 
     # Filter the dataframe
-    filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (filtered_convStores_df['year'] <= selected_years_conv[1])]
+    filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
 
     # Create the plot
     fig2 = px.line(filtered_convStores_df, x='year', y=['Alcohol', 'Cigarettes', 'Food stores'],
@@ -323,6 +355,65 @@ def run_data_analysis():
     Using median family income data, we dissect Brooklyn’s tracts and established considerable differences that call for interventions. Redressing these imbalances through serious, inclusive economic development deploys for people, effective, quality public services, community development projects, etc. can meanwhile revolutionize the quality of lives of the affected populations. Also, investing in the priority areas known as food deserts can increase associated access of healthy food items and therefore benefit health of a nation’s people. This analysis can act as an important guide for policy makers, researchers and communal leaders who are involved in the process of striving for economic and social justice in Brooklyn.
     """)
 
+# Function to handle the Home page
+def run_home_page():
+    st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
+
+    # Display the new Brooklyn image
+    brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
+    st.image(brooklyn_image, use_column_width=True, caption='Brooklyn, NY')
+
+    # Add the descriptive text below the image
+    text_content = """
+    ### Understanding Food Deserts
+
+    According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
+
+    1. **A poverty rate greater than or equal to 20 percent,** or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
+    2. **At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.**
+
+    Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
+
+    To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like **SNAP benefits, poverty rates, and income levels** frequently appeared in areas recognized as food deserts.
+
+    To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
+    """
+
+    # Highlight the text dynamically as it is read out
+    st.markdown(f"<div id='text-content'>{text_content}</div>", unsafe_allow_html=True)
+
+    # JavaScript to dynamically highlight and read the text
+    st.markdown("""
+    <script>
+        const text = document.getElementById('text-content').innerText;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.25;
+        utterance.onboundary = function(event) {
+            const textEl = document.getElementById('text-content');
+            const chars = text.split('');
+            const start = event.charIndex;
+            const end = start + event.charLength;
+            textEl.innerHTML = chars.map((char, index) => {
+                if (index >= start && index < end) {
+                    return `<mark>${char}</mark>`;
+                } else {
+                    return char;
+                }
+            }).join('');
+        };
+        speechSynthesis.speak(utterance);
+    </script>
+    """, unsafe_allow_html=True)
+
+    # Add subtitle and video
+    st.markdown("""
+    ### Why We Need a Food Desert Finder Application
+
+    The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
+
+    <iframe width="700" height="400" src="https://www.youtube.com/embed/NgahWWPGkM8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    """, unsafe_allow_html=True)
+
 # Main function to create the app
 def main():
     st.sidebar.title("Navigation")
@@ -339,71 +430,7 @@ def main():
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     if selection == "Home":
-        # Title of the homepage
-        st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
-
-        # Display the new Brooklyn image
-        brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
-        st.image(brooklyn_image, use_column_width=True, caption='Brooklyn, NY')
-
-        # Add the descriptive text below the image
-        text_to_read = """
-        ### Understanding Food Deserts
-
-        According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
-
-        1. **A poverty rate greater than or equal to 20 percent,** or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
-        2. **At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.**
-
-        Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
-
-        To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like **SNAP benefits, poverty rates, and income levels** frequently appeared in areas recognized as food deserts.
-
-        To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
-        """
-
-        st.markdown(text_to_read)
-        simulate_highlighting(text_to_read, speed=1.25)
-        audio_file = read_aloud(text_to_read, speed=1.25)
-        st.audio(audio_file)
-
-        # Create two columns for the new text and infographic
-        col1, col2 = st.columns([1, 1])  # Adjust proportions if needed
-
-        with col1:
-            # Add the new descriptive text in the first column
-            text_to_read = """
-            ### Clustering Algorithms and Model Selection
-
-            The selected variables were normalized within a range of 0-100 before being processed by these algorithms. Among them, **DB Scan** emerged as the most effective clustering model, with a silhouette score of 0.56.
-
-            The variables included in the final model were:
-            1. **SNAP Benefits:** The proportion of households using SNAP benefits to purchase food.
-            2. **Population Earning Less Than $40K.**
-            3. **Proportion of Population with Less Than a High School Diploma.**
-            4. **Food Index:** A derived variable representing food accessibility.
-
-            The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
-            """
-            st.markdown(text_to_read)
-            simulate_highlighting(text_to_read, speed=1.25)
-            audio_file = read_aloud(text_to_read, speed=1.25)
-            st.audio(audio_file)
-
-        with col2: 
-            # Display the infographic in the second column
-            infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
-            st.image(infographic_image, use_column_width=True)
-
-        # Add subtitle and video
-        st.markdown("""
-        ### Why We Need a Food Desert Finder Application
-
-        The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
-
-        <iframe width="700" height="400" src="https://www.youtube.com/embed/NgahWWPGkM8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        """, unsafe_allow_html=True)
-
+        run_home_page()
 
     elif selection == "Data Analysis":
         run_data_analysis()
