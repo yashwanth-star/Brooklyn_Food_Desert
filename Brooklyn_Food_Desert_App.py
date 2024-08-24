@@ -440,6 +440,17 @@ def main():
 
         with tabs[0]:
             st.header("LILA (Food Desert Zones)")
+            st.markdown("""
+            The LILA (Low Income, Low Access) Zones map visualizes areas identified as food deserts according to the USDA's criteria. A food desert is a geographic area where residents have limited access to affordable and nutritious food, often due to the absence of supermarkets and grocery stores nearby. These zones are classified based on two key factors:
+
+            - **Low Income:** Areas where the poverty rate is 20% or higher, or where the median family income is at or below 80% of the statewide median.
+            - **Low Access:** Areas where at least 500 people, or 33% of the population, live more than 1 mile away from a supermarket in urban areas, or more than 10 miles away in rural areas.
+
+            **Significance:**
+            - **Understanding Food Insecurity:** LILA Zones highlight regions where food insecurity is most acute, indicating where residents may face significant challenges in accessing fresh, healthy food due to economic and geographical barriers.
+            - **Targeting Interventions:** By mapping these zones, policymakers and community leaders can more effectively allocate resources, such as food assistance programs, community gardens, or incentives for grocery stores to open in underserved areas.
+            - **Health Implications:** LILA Zones are often correlated with higher rates of diet-related illnesses, such as obesity, diabetes, and heart disease, due to the limited availability of healthy food options.
+            """)
 
             # Initial filter
             nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
