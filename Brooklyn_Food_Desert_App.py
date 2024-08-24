@@ -1,10 +1,13 @@
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
-from shapely import wkt
 import folium
 from streamlit_folium import folium_static
+from shapely import wkt
 import base64
+import plotly.express as px
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
 from PIL import Image
 
 # Cache the data loading and processing function
@@ -355,65 +358,6 @@ def run_data_analysis():
     Using median family income data, we dissect Brooklyn’s tracts and established considerable differences that call for interventions. Redressing these imbalances through serious, inclusive economic development deploys for people, effective, quality public services, community development projects, etc. can meanwhile revolutionize the quality of lives of the affected populations. Also, investing in the priority areas known as food deserts can increase associated access of healthy food items and therefore benefit health of a nation’s people. This analysis can act as an important guide for policy makers, researchers and communal leaders who are involved in the process of striving for economic and social justice in Brooklyn.
     """)
 
-# Function to handle the Home page
-def run_home_page():
-    st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
-
-    # Display the new Brooklyn image
-    brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
-    st.image(brooklyn_image, use_column_width=True, caption='Brooklyn, NY')
-
-    # Add the descriptive text below the image
-    text_content = """
-    ### Understanding Food Deserts
-
-    According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
-
-    1. **A poverty rate greater than or equal to 20 percent,** or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
-    2. **At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.**
-
-    Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
-
-    To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like **SNAP benefits, poverty rates, and income levels** frequently appeared in areas recognized as food deserts.
-
-    To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
-    """
-
-    # Highlight the text dynamically as it is read out
-    st.markdown(f"<div id='text-content'>{text_content}</div>", unsafe_allow_html=True)
-
-    # JavaScript to dynamically highlight and read the text
-    st.markdown("""
-    <script>
-        const text = document.getElementById('text-content').innerText;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.25;
-        utterance.onboundary = function(event) {
-            const textEl = document.getElementById('text-content');
-            const chars = text.split('');
-            const start = event.charIndex;
-            const end = start + event.charLength;
-            textEl.innerHTML = chars.map((char, index) => {
-                if (index >= start && index < end) {
-                    return `<mark>${char}</mark>`;
-                } else {
-                    return char;
-                }
-            }).join('');
-        };
-        speechSynthesis.speak(utterance);
-    </script>
-    """, unsafe_allow_html=True)
-
-    # Add subtitle and video
-    st.markdown("""
-    ### Why We Need a Food Desert Finder Application
-
-    The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
-
-    <iframe width="700" height="400" src="https://www.youtube.com/embed/NgahWWPGkM8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    """, unsafe_allow_html=True)
-
 # Main function to create the app
 def main():
     st.sidebar.title("Navigation")
@@ -430,7 +374,62 @@ def main():
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     if selection == "Home":
-        run_home_page()
+        # Title of the homepage
+        st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
+
+        # Display the new Brooklyn image
+        brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
+        st.image(brooklyn_image, use_column_width=True, caption='Brooklyn, NY')
+
+        # Add the descriptive text below the image
+        st.markdown("""
+        ### Understanding Food Deserts
+
+        According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
+
+        1. **A poverty rate greater than or equal to 20 percent,** or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
+        2. **At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.**
+
+        Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
+
+        To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like **SNAP benefits, poverty rates, and income levels** frequently appeared in areas recognized as food deserts.
+
+        To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
+        """)
+
+        # Create two columns for the new text and infographic
+        col1, col2 = st.columns([1, 1])  # Adjust proportions if needed
+
+        with col1:
+            # Add the new descriptive text in the first column
+            st.markdown("""
+            ### Clustering Algorithms and Model Selection
+
+            The selected variables were normalized within a range of 0-100 before being processed by these algorithms. Among them, **DB Scan** emerged as the most effective clustering model, with a silhouette score of 0.56.
+
+            The variables included in the final model were:
+            1. **SNAP Benefits:** The proportion of households using SNAP benefits to purchase food.
+            2. **Population Earning Less Than $40K.**
+            3. **Proportion of Population with Less Than a High School Diploma.**
+            4. **Food Index:** A derived variable representing food accessibility.
+
+            The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
+            """)
+
+        with col2: 
+            # Display the infographic in the second column
+            infographic_image = Image.open("12.6 % of households in Brooklyn rely on SNAP (S.png")
+            st.image(infographic_image, use_column_width=True)
+
+        # Add subtitle and video
+        st.markdown("""
+        ### Why We Need a Food Desert Finder Application
+
+        The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
+
+        <iframe width="700" height="400" src="https://www.youtube.com/embed/NgahWWPGkM8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        """, unsafe_allow_html=True)
+
 
     elif selection == "Data Analysis":
         run_data_analysis()
