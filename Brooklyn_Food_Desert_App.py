@@ -9,6 +9,7 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from PIL import Image
+from gtts import gTTS
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -85,6 +86,18 @@ def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
                 unsafe_allow_html=True
             )
 
+# Function to handle text-to-speech conversion and playback
+def text_to_speech(text):
+    tts = gTTS(text)
+    tts.save("text_to_speech.mp3")
+    audio_file = open("text_to_speech.mp3", "rb").read()
+    st.audio(audio_file, format="audio/mp3")
+
+# Function to create an AI voice readout button
+def ai_readout_button(text):
+    if st.button("🔊 Read Aloud"):
+        text_to_speech(text)
+
 # Function to handle data analysis page
 def run_data_analysis():
     # Load the datasets
@@ -137,7 +150,7 @@ def run_data_analysis():
     selected_years_conv = st.slider('Select years for convenience stores', min_value=int(years_conv.min()), max_value=int(years_conv.max()), value=(int(years_conv.min()), int(years_conv.max())), key='slider_conv')
 
     # Filter the dataframe
-    filtered_convStores_df = convStores_df[(convStores_df['year'] >= selected_years_conv[0]) & (convStores_df['year'] <= selected_years_conv[1])]
+    filtered_convStores_df = convStores_df[(filtered_convStores_df['year'] >= selected_years_conv[0]) & (filtered_convStores_df['year'] <= selected_years_conv[1])]
 
     # Create the plot
     fig2 = px.line(filtered_convStores_df, x='year', y=['Alcohol', 'Cigarettes', 'Food stores'],
@@ -381,6 +394,22 @@ def main():
         brooklyn_image = Image.open("pexels-mario-cuadros-1166886-2706653.jpg")
         st.image(brooklyn_image, use_column_width=True, caption='Brooklyn, NY')
 
+        # The text to be read aloud
+        read_aloud_text = """
+        Understanding Food Deserts
+
+        According to the USDA, a food desert is defined as a census tract that meets both low-income and low-access criteria, including:
+
+        1. A poverty rate greater than or equal to 20 percent, or median family income not exceeding 80 percent of the statewide (rural/urban) or metro-area (urban) median family income.
+        2. At least 500 people or 33 percent of the population located more than 1 mile (urban) or 10 miles (rural) from the nearest supermarket or large grocery store.
+
+        Our analysis of the Food Access Research Atlas 2019 aimed to identify census tracts that meet this definition of food deserts (LILA zones). However, the dataset did not reveal any census tracts classified as food deserts.
+
+        To delve deeper, we explored various sources such as community blog posts, research papers, and news articles to understand how these census tracts are identified and categorized as food or non-food deserts. While the Food Access Research Atlas provided limited insights, other sources pointed us toward key features to consider when classifying a census tract as a food desert. Factors like SNAP benefits, poverty rates, and income levels frequently appeared in areas recognized as food deserts.
+
+        To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like K-Means, Gaussian Mixture, and DB Scan.
+        """
+        
         # Add the descriptive text below the image
         st.markdown("""
         ### Understanding Food Deserts
@@ -397,6 +426,9 @@ def main():
         To create a comprehensive dataset, we explored the repository of datasets provided on the NaNDA (National Neighborhood Data Archive) website, which included demographic characteristics, socioeconomic characteristics, grocery level, etc., along with the Food Access Research Atlas. After experimenting with various combinations of variables, we selected a set of variables to input into clustering algorithms like **K-Means, Gaussian Mixture, and DB Scan.**
         """)
 
+        # Add the AI voice readout button
+        ai_readout_button(read_aloud_text)
+
         # Create two columns for the new text and infographic
         col1, col2 = st.columns([1, 1])  # Adjust proportions if needed
 
@@ -411,7 +443,7 @@ def main():
             1. **SNAP Benefits:** The proportion of households using SNAP benefits to purchase food.
             2. **Population Earning Less Than $40K.**
             3. **Proportion of Population with Less Than a High School Diploma.**
-            4. **Food Index:** A derived variable representing food accessibility.
+             4. **Food Index:** A derived variable representing food accessibility.
 
             The **Food Index** was calculated by combining the number of supermarkets, coffee shops, fast food restaurants, and the poverty rate. We used a weighted average, assigning weights of +0.4 to supermarkets, +0.1 to coffee shops, and -0.5 to fast-food restaurants. These were then combined with the poverty rate to assess healthy food accessibility across Brooklyn's census tracts. The negative weight for fast food restaurants reflects their status as less healthy food options compared to supermarkets and coffee shops.
             """)
