@@ -9,6 +9,8 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from PIL import Image
+from gtts import gTTS
+import os
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -95,8 +97,14 @@ def run_data_analysis():
 
     st.title("Interactive Data Analysis Page")
 
+    # Button to read aloud the text
+    if st.button("🔊 Read Text Aloud"):
+        text_to_speech("Interactive Data Analysis Page")
+    
     ### 1. Family Income vs Race (2016-2020)
     st.header("Family Income vs Race (2016-2020)")
+    if st.button("🔊 Read Family Income vs Race Text"):
+        text_to_speech("Family Income vs Race")
 
     # Rename columns for better display names
     socioeconomics_df.columns = ['ALL', 'White', 'Black', 'Hispanic']
@@ -121,9 +129,13 @@ def run_data_analysis():
     #### Explanation:
     This boxplot visualizes the distribution of family incomes across different racial groups between 2016 and 2020. Each box represents the interquartile range (IQR), showing the median and spread of the data. The whiskers indicate variability outside the upper and lower quartiles, while points beyond the whiskers are outliers. This visualization helps in identifying income disparities among various racial groups.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Explanation: This boxplot visualizes the distribution of family incomes across different racial groups between 2016 and 2020. Each box represents the interquartile range...")
 
     ### 2. Employment in Convenience Stores Over Time
     st.header("Employment in Convenience Stores Over Time")
+    if st.button("🔊 Read Employment in Convenience Stores Over Time Text"):
+        text_to_speech("Employment in Convenience Stores Over Time")
 
     # Rename columns for better display names
     convStores_df = convStores_df.rename(columns={
@@ -152,9 +164,13 @@ def run_data_analysis():
     #### Explanation:
     This line chart illustrates the trends in employment across different types of stores, including convenience stores, other general stores, and grocery stores over several years. The x-axis represents the years, while the y-axis represents the count of employees. The lines demonstrate how employment levels have changed over time, helping to identify growth or decline trends in these sectors.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Explanation: This line chart illustrates the trends in employment across different types of stores...")
 
     ### 3. Employment in Eating Establishments Over Time
     st.header("Employment in Eating Establishments Over Time")
+    if st.button("🔊 Read Employment in Eating Establishments Over Time Text"):
+        text_to_speech("Employment in Eating Establishments Over Time")
 
     # Rename columns for better display names
     eating_df = eating_df.rename(columns={
@@ -184,9 +200,13 @@ def run_data_analysis():
     #### Explanation:
     This line chart displays employment trends in various eating establishments, such as full-service restaurants, limited-service restaurants, snack and nonalcoholic beverage bars, and caterers over time. The x-axis denotes the years, and the y-axis indicates the count of employees. This plot helps in understanding how employment in different types of eating establishments has evolved, highlighting periods of growth or decline.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Explanation: This line chart displays employment trends in various eating establishments...")
 
     ### 4. Employment in Convenience Stores, Liquor, and Tobacco Stores
     st.header("Employment in Convenience Stores, Liquor, and Tobacco Stores")
+    if st.button("🔊 Read Employment in Convenience Stores, Liquor, and Tobacco Stores Text"):
+        text_to_speech("Employment in Convenience Stores, Liquor, and Tobacco Stores")
 
     # Create the grouped bar plot
     bar_width = 0.2
@@ -213,9 +233,13 @@ def run_data_analysis():
     #### Explanation:
     This grouped bar plot visualizes the mean count of employees in convenience stores, liquor stores, and tobacco stores over several years. Each group of bars represents a different year, and within each group, there are bars for alcohol, food stores, and cigarettes. This plot helps in understanding the employment trends in these specific categories over time.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Explanation: This grouped bar plot visualizes the mean count of employees in convenience stores...")
 
     ### 5. Employment in Eating & Drinking Data
     st.header("Employment in Eating & Drinking Data")
+    if st.button("🔊 Read Employment in Eating & Drinking Data Text"):
+        text_to_speech("Employment in Eating & Drinking Data")
 
     # Create the grouped bar plot
     bar_width = 0.35
@@ -245,9 +269,13 @@ def run_data_analysis():
     #### Explanation:
     This grouped bar plot visualizes the mean count of employees in various types of eating and drinking establishments over several years. Each group of bars represents a different year, and within each group, there are bars for restaurants, fast-foods, snack places, and drinking places. This plot helps in understanding the employment trends in these specific categories over time.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Explanation: This grouped bar plot visualizes the mean count of employees in various types of eating and drinking establishments...")
 
     ### 6. Correlation Heatmap
     st.header("Correlation Heatmap")
+    if st.button("🔊 Read Correlation Heatmap Text"):
+        text_to_speech("Correlation Heatmap")
 
     # Filter options
     columns = list(corrPlot_df.columns)  # Convert Index to list
@@ -274,9 +302,13 @@ def run_data_analysis():
     #### Explanation:
     This correlation heatmap visualizes the relationships between different variables in the dataset. Each cell in the heatmap shows the correlation coefficient between two variables, with colors representing the strength and direction of the correlation. Positive correlations are shown in one color gradient, while negative correlations are in another. This plot is useful for identifying which variables are strongly related, aiding in data analysis and decision-making.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Explanation: This correlation heatmap visualizes the relationships between different variables in the dataset...")
 
     ### Baseline Analysis Median Family Income
     st.header("Baseline Analysis Median Family Income")
+    if st.button("🔊 Read Baseline Analysis Median Family Income Text"):
+        text_to_speech("Baseline Analysis Median Family Income")
 
     # Load and display image
     st.image('Baseline Analysis_Med Family Income.png', use_column_width=True)
@@ -357,6 +389,14 @@ def run_data_analysis():
     ### Conclusion:
     Using median family income data, we dissect Brooklyn’s tracts and established considerable differences that call for interventions. Redressing these imbalances through serious, inclusive economic development deploys for people, effective, quality public services, community development projects, etc. can meanwhile revolutionize the quality of lives of the affected populations. Also, investing in the priority areas known as food deserts can increase associated access of healthy food items and therefore benefit health of a nation’s people. This analysis can act as an important guide for policy makers, researchers and communal leaders who are involved in the process of striving for economic and social justice in Brooklyn.
     """)
+    if st.button("🔊 Read Explanation Text"):
+        text_to_speech("Review and Interpretation of Baseline Analysis of Median Family Income for Brooklyn...")
+
+# Function to convert text to speech using gTTS
+def text_to_speech(text):
+    tts = gTTS(text)
+    tts.save("temp_audio.mp3")
+    st.audio("temp_audio.mp3")
 
 # Main function to create the app
 def main():
@@ -374,6 +414,10 @@ def main():
     selection = st.sidebar.radio("Go to", pages, format_func=lambda page: f"{page_icons[page]} {page}")
 
     if selection == "Home":
+        # Button to read aloud the text
+        if st.button("🔊 Read Text Aloud"):
+            text_to_speech("Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI...")
+
         # Title of the homepage
         st.markdown("<h2 style='text-align: center;'>Evaluating Solutions to Ameliorate the Impact of Food Deserts in Brooklyn Using AI</h2>", unsafe_allow_html=True)
 
