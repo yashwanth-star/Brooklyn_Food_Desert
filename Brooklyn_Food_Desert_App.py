@@ -524,18 +524,19 @@ def main():
 
             The Supermarket Coverage Ratio map illustrates the density of supermarkets in relation to the population within different census tracts. This map provides insights into how well different areas are served by supermarkets.
 
-            - **Supermarket Coverage Ratio:** This ratio is calculated by comparing the number of supermarkets in a given area to the population size. **A lower ratio** indicates better access to supermarkets (fewer people per supermarket), while **a higher ratio** suggests that an area may be underserved (more people per supermarket).
+            - **Supermarket Coverage Ratio:** This ratio is calculated by comparing the number of supermarkets in a given area to the population size. **A lower ratio** indicates poorer access to supermarkets (more people per supermarket), while **a higher ratio** suggests that an area may be better served (fewer people per supermarket).
 
             **Ranking System:**
 
-            - **Rank Order:** Each census tract is assigned a rank based on supermarket coverage, with Rank 1 indicating the best supermarket reachability (lowest ratio), and higher ranks indicating progressively poorer coverage (higher ratios). This ranking helps quickly identify areas with the most and least supermarket access.
+            - **Rank Order:** Each census tract is assigned a rank based on supermarket coverage, with Rank 1 indicating the worst supermarket reachability (lower ratio), and higher ranks indicating progressively better coverage (higher ratios). This ranking helps quickly identify areas with the most and least supermarket access.
 
             **Significance:**
 
-            - **Assessing Food Accessibility:** The Supermarket Coverage Ratio map helps identify areas with good access to supermarkets versus those that are underserved. This can highlight regions where residents may struggle to purchase fresh and healthy food.
-            - **Economic Insights:** Areas with low supermarket coverage ratios (and thus better access) tend to have better economic conditions, as residents have more opportunities to buy affordable and nutritious food. Areas with higher ratios may face economic disadvantages, potentially limiting access to healthy food and contributing to cycles of poverty and poor health.
+            - **Assessing Food Accessibility:** The Supermarket Coverage Ratio map helps identify areas with poor access to supermarkets versus those that are better served. This can highlight regions where residents may struggle to purchase fresh and healthy food.
+            - **Economic Insights:** Areas with high supermarket coverage ratios (better access) tend to have better economic conditions, as residents have more opportunities to buy affordable and nutritious food. Areas with lower ratios (poorer access) may face economic disadvantages, potentially limiting access to healthy food and contributing to cycles of poverty and poor health.
             - **Planning and Development:** Urban planners and policymakers can use this map to promote the development of new supermarkets in underserved areas, thereby improving food access and local economies.
             ''')
+
 
             
             # Add a select slider for the years
