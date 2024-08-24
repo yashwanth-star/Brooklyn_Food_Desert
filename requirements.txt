@@ -6,3 +6,5 @@ shapely
 geopandas
 streamlit
 plotly
+gtts
+gTTS
