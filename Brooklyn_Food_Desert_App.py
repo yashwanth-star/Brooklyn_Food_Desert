@@ -427,7 +427,7 @@ def main():
 
         The need for a Food Desert Finder application is driven by the desire to identify and address areas where residents have limited access to affordable and nutritious food. By leveraging AI and data analysis, we can pinpoint the communities most in need of support and implement targeted interventions to improve food access and overall health outcomes.
 
-        <iframe width="700" height="400" src="https://www.youtube.com/embed/h_F59ypE04k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe width="700" height="400" src="https://youtu.be/NgahWWPGkM8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         """, unsafe_allow_html=True)
 
     elif selection == "Data Analysis":
@@ -435,10 +435,10 @@ def main():
 
     elif selection == "Data Visualization":
         # Map selection using tabs
-        tabs = st.tabs(["LILA & Non-LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
+        tabs = st.tabs(["LILA Zones", "Supermarket Coverage Ratio", "Fast Food Coverage Ratio"])
 
         with tabs[0]:
-            st.header("LILA & Non-LILA Zones")
+            st.header("LILA (Food Desert Zones")
 
             # Initial filter
             nta_options = ["All"] + gdf_lila['NTA Name'].unique().tolist()
