@@ -11,6 +11,8 @@ import plotly.graph_objects as go
 from PIL import Image
 import requests
 
+# Load token from Streamlit secrets
+GITHUB_TOKEN = st.secrets["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"]
 # GitHub details
 GITHUB_REPO = "yashwanth-star/Brooklyn_Food_Desert"
 GITHUB_FILE_PATH = "comments.csv"
