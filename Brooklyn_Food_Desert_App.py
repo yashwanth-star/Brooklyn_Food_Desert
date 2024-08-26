@@ -710,8 +710,6 @@ def main():
         - 🧠 **Clustering Algorithms and Model Selection**: Discover the AI models that power our analysis. Dive into the tech side of things! 💻
         - 🚨 **Why We Need a Food Desert Finder Application**: Understand the critical need for this tool in improving food access in underprivileged areas.
         """)
-        # Add a placeholder for a GIF
-        st.image("path/to/your/food_desert_visualization_map.gif", caption="Food Desert Visualization Map", use_column_width=True)
         
         # Data Analysis Page Section
         st.markdown("""
@@ -746,10 +744,6 @@ def main():
         - 🔍 **Purpose**: Explore the density of fast-food outlets in different areas. Where are the fast-food hotspots? 🌭
         - 🎯 **How to Use**: Similar to the Supermarket Coverage Ratio, adjust the filters to explore different regions and years. Which areas are dominated by fast food? 🍟
         """)
-        # Add placeholders for GIFs or images
-        st.image("path/to/your/lila_zones_map.gif", caption="LILA Zones Map", use_column_width=True)
-        st.image("path/to/your/supermarket_coverage_map.gif", caption="Supermarket Coverage Ratio Map", use_column_width=True)
-        st.image("path/to/your/fast_food_coverage_map.gif", caption="Fast Food Coverage Ratio Map", use_column_width=True)
         
         # Food Policy Reports Page Section
         st.markdown("""
