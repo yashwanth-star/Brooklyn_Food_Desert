@@ -724,8 +724,6 @@ def main():
         - 🔥 **Correlation Heatmap**: Pick your variables and see how they relate. This heatmap is your go-to for discovering strong correlations. 🧩
         - 🏡 **Baseline Analysis Median Family Income**: Visualize the economic conditions across Brooklyn. How does family income vary by tract? 🏘️
         """)
-        # Add a placeholder for a GIF
-        st.image("path/to/your/data_analysis_slider_interaction.gif", caption="Interacting with Sliders on the Data Analysis Page", use_column_width=True)
         
         # Data Visualization Page Section
         st.markdown("""
