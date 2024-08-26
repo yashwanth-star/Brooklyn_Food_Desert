@@ -687,6 +687,7 @@ def main():
         """)
 
     elif selection == "Comments":
+        
         st.title("💬 Share Your Thoughts and Feedback")
     
         # Introduction to the comments section
@@ -745,6 +746,7 @@ def main():
                 """, unsafe_allow_html=True)
         else:
             st.info("No comments yet. Be the first to leave one!")
+
 
 
     elif selection == "Guide":
