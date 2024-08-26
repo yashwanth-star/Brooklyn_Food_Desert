@@ -78,7 +78,7 @@ def display_tooltip_info(gdf_filtered, year, coverage_ratio_col):
                 f"""
                 <div style="border:1px solid #ddd; border-radius: 10px; padding: 10px; margin: 10px 0; background-color: #f9f9f9;">
                     <h4 style="color: #2E7D32;">Census Tract Area: {row['TRACTCE']}</h4>
-                    <p><span style="color: #D32F2F;">{year}: </span>{row[coverage_ratio_col]}</p>
+                    <p><span style="color: #D32F2F;">The {year} Coverage ratio: </span>{row[coverage_ratio_col]}</p>
                     <p><span style="color: #1976D2;">Rank: </span>{row[f'{year}_rank']}</p>
                 </div>
                 """,
