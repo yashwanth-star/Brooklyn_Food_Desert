@@ -11,12 +11,12 @@ import plotly.graph_objects as go
 from PIL import Image
 import requests
 
-# Load token from Streamlit secrets
-GITHUB_TOKEN = st.secrets["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"]
-# GitHub details
-GITHUB_REPO = "yashwanth-star/Brooklyn_Food_Desert"
-GITHUB_FILE_PATH = "comments.csv"
-GITHUB_URL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{GITHUB_FILE_PATH}"
+import streamlit as st
+import pandas as pd
+import os
+
+# Define the path to your local CSV file
+comments_file = "comments.csv"
 
 # Cache the data loading and processing function
 @st.cache_data
@@ -711,48 +711,27 @@ def main():
         # Submit Button
         if st.button("Submit"):
             if user_comment:
-                try:
-                    # Load existing comments
-                    comments_df = pd.read_csv(GITHUB_URL)
-    
-                    # Add new comment to the DataFrame
-                    new_comment = pd.DataFrame({"Comment": [user_comment]})
-                    comments_df = pd.concat([comments_df, new_comment], ignore_index=True)
-    
-                except:
-                    # If file doesn't exist or is empty, create a new DataFrame
-                    comments_df = pd.DataFrame({"Comment": [user_comment]})
-    
-                # Save the updated comments locally
-                comments_df.to_csv(GITHUB_FILE_PATH, index=False)
-    
-                # Update the CSV file on GitHub
-                with open(GITHUB_FILE_PATH, "rb") as file:
-                    content = file.read()
-                encoded_content = base64.b64encode(content).decode()
-                url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
-                headers = {
-                    "Authorization": f"token {GITHUB_TOKEN}",
-                    "Content-Type": "application/json"
-                }
-                sha = requests.get(url, headers=headers).json().get("sha")  # Get the latest SHA of the file
-                data = {
-                    "message": "New comment added",
-                    "content": encoded_content,
-                    "sha": sha  # Use the SHA of the latest file version
-                }
-                response = requests.put(url, headers=headers, json=data)
-                if response.status_code == 200:
-                    st.success("Comment saved successfully! 🎉")
+                # Load existing comments or create a new DataFrame if it doesn't exist
+                if os.path.exists(comments_file):
+                    comments_df = pd.read_csv(comments_file)
                 else:
-                    st.error("Failed to save the comment. Please try again. 😞")
+                    comments_df = pd.DataFrame(columns=["Comment"])
+    
+                # Add the new comment to the DataFrame
+                new_comment = pd.DataFrame({"Comment": [user_comment]})
+                comments_df = pd.concat([comments_df, new_comment], ignore_index=True)
+    
+                # Save the updated DataFrame back to the CSV file
+                comments_df.to_csv(comments_file, index=False)
+    
+                st.success("Comment saved successfully! 🎉")
             else:
                 st.warning("Please write a comment before submitting. 📝")
     
         # Display recent comments
         st.markdown("### 💬 Recent Comments")
-        try:
-            comments_df = pd.read_csv(GITHUB_URL)
+        if os.path.exists(comments_file):
+            comments_df = pd.read_csv(comments_file)
             if not comments_df.empty:
                 for comment in comments_df["Comment"].tail(5):  # Display the last 5 comments
                     st.markdown(f"""
@@ -762,10 +741,11 @@ def main():
                     """, unsafe_allow_html=True)
             else:
                 st.info("No comments yet. Be the first to leave one!")
-        except:
+        else:
             st.info("No comments yet. Be the first to leave one!")
 
-
+        
+ 
 
 
     elif selection == "Guide":
