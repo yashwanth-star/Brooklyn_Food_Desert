@@ -11,6 +11,11 @@ import plotly.graph_objects as go
 from PIL import Image
 import requests
 
+# GitHub details
+GITHUB_REPO = "yashwanth-star/Brooklyn_Food_Desert"
+GITHUB_FILE_PATH = "comments.csv"
+GITHUB_URL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{GITHUB_FILE_PATH}"
+
 # Cache the data loading and processing function
 @st.cache_data
 def load_data(file_path):
@@ -687,11 +692,6 @@ def main():
         Food policy reports are invaluable resources provided by the New York City Council that guide our journey toward a healthier, more equitable, and sustainable food system. By leveraging the data and insights provided in these reports, we can implement effective policies and initiatives that benefit everyone.
         """)
     
-    
-    # GitHub details
-    GITHUB_REPO = "yashwanth-star/Brooklyn_Food_Desert"
-    GITHUB_FILE_PATH = "comments.csv"
-    GITHUB_URL = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{GITHUB_FILE_PATH}"
     
     # Comment section in the Streamlit app
     elif selection == "Comments":
