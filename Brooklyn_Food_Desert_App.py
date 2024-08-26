@@ -10,9 +10,6 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from PIL import Image
 import requests
-
-import streamlit as st
-import pandas as pd
 import os
 
 # Define the path to your local CSV file
