@@ -691,10 +691,9 @@ def main():
         st.text_area("Comments:")
 
     elif selection == "Guide":
-        import streamlit as st
 
         # Set the title of the Guide page
-        st.title("📖 Welcome to the Food Desert Finder Application!")
+        st.title("📖 Guide to Using the Food Desert Finder Application")
         
         # Introduction
         st.markdown("""
