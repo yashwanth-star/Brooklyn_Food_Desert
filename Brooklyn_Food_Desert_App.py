@@ -691,7 +691,73 @@ def main():
         st.text_area("Comments:")
 
     elif selection == "Guide":
-        st.write("How to use the app content goes here.")
+        import streamlit as st
+
+        # Set the title of the Guide page
+        st.title("📖 Welcome to the Food Desert Finder Application!")
+        
+        # Introduction
+        st.markdown("""
+        Welcome to the **Food Desert Finder Application**! This guide will help you navigate through the various features of the app and utilize it effectively to understand and address food accessibility issues in Brooklyn. 🌇 Let's get started! 🚀
+        """)
+
+        # Navigation Section
+        st.markdown("""
+        ### 🧭 **Navigation Overview**
+        Our app is organized into several sections, each serving a unique purpose. Here's a quick breakdown:
+        
+        1. **🏠 Home**: Start here to get an overview of the project and understand the importance of addressing food deserts.
+        2. **📊 Data Analysis**: Dive deep into interactive data analysis with charts and plots that provide insights into various socio-economic factors related to food deserts.
+        3. **📈 Data Visualization**: Explore maps that show LILA Zones, Supermarket Coverage, and Fast Food Coverage to understand the food landscape better.
+        4. **📄 Food Policy Reports**: Access comprehensive reports on food policy in New York City, providing context and data-driven insights.
+        5. **💬 Comments**: Have feedback or thoughts? Share them with us in the Comments section.
+        6. **📖 Guide**: You are here! Use this page to learn how to navigate and use the application effectively.
+        
+        *Tip: You can switch between sections using the sidebar on the left. 📋*
+        """)
+        
+        # Detailed Section Descriptions
+        st.markdown("""
+        ### 🏠 **Home**
+        The Home page offers an introduction to the project. You’ll find a brief overview of food deserts, the criteria used to identify them, and a video explaining the importance of this project. 📹
+        - **Getting Started**: Begin by reading through the introduction to get a sense of the issue at hand.
+        - **Watch the Video**: If you prefer a visual summary, our video provides a quick overview. 🍿
+        
+        ### 📊 **Data Analysis**
+        In the Data Analysis section, you’ll find interactive charts and graphs that allow you to explore the data in detail. 📊
+        - **Interact with Charts**: Use the filters and sliders to customize the data you're viewing. This section helps you understand the socio-economic factors that contribute to food deserts.
+        - **Explore Insights**: Each chart is followed by a brief explanation to help you interpret the data. Make sure to read these to get the full picture! 🧠
+        
+        ### 📈 **Data Visualization**
+        This section features three interactive maps:
+        - **LILA Zones**: View areas classified as food deserts based on income and access to supermarkets. 🗺️
+        - **Supermarket Coverage**: See how well different areas are served by supermarkets. A lower coverage ratio indicates better access. 🛒
+        - **Fast Food Coverage**: Understand the density of fast-food outlets relative to the population. Higher coverage ratios can indicate less healthy food environments. 🍟
+        
+        *Tip: Click on different areas in the map to see detailed information about each location! 🧐*
+
+        ### 📄 **Food Policy Reports**
+        Access detailed reports on food policies in NYC. These reports provide valuable context and data that support the analysis in the other sections. 📚
+        - **Read Reports**: Click on the report links to view or download them. They are essential for understanding the broader policy context. 🔗
+        
+        ### 💬 **Comments**
+        We value your feedback! 📝
+        - **Share Your Thoughts**: Use this section to leave comments, suggestions, or questions. Your input helps us improve the app and address your concerns. 💬
+        
+        ### 📖 **Guide**
+        You're already here! The Guide section is designed to help you navigate the app and get the most out of its features. 🧭
+        
+        *Tip: If you ever feel lost, come back to the Guide page for help!*
+        """)
+        
+        # Closing Section
+        st.markdown("""
+        ### 🚀 **Ready to Explore?**
+        Now that you're familiar with the app's layout and features, dive in and start exploring! Whether you're analyzing data, visualizing maps, or reading policy reports, we hope this tool empowers you to make a difference in addressing food deserts.
+        
+        *Happy exploring!* 🎉
+        """)
+
 
 if __name__ == "__main__":
     main()
