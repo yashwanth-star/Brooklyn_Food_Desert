@@ -697,65 +697,84 @@ def main():
         
         # Introduction
         st.markdown("""
-        Welcome to the **Food Desert Finder Application**! This guide will help you navigate through the various features of the app and utilize it effectively to understand and address food accessibility issues in Brooklyn. 🌇 Let's get started! 🚀
+        Welcome to the **Food Desert Finder Application**! 🎉 This guide is your companion to navigating through the various features of the app. Let's make your journey to exploring food access in Brooklyn both informative and fun! 🚀
+        """)
+        
+        # Home Page Section
+        st.markdown("""
+        ### 🏠 Home Page
+        The Home Page is your starting point. Here, you'll get an overview of the application and understand its mission to tackle food deserts in Brooklyn using AI and data analysis.
+        
+        🌍 **Key Sections on the Home Page**:
+        - 🔍 **Understanding Food Deserts**: Learn what food deserts are and why they matter. This section sets the stage for the rest of your exploration.
+        - 🧠 **Clustering Algorithms and Model Selection**: Discover the AI models that power our analysis. Dive into the tech side of things! 💻
+        - 🚨 **Why We Need a Food Desert Finder Application**: Understand the critical need for this tool in improving food access in underprivileged areas.
+        """)
+        # Add a placeholder for a GIF
+        st.image("path/to/your/food_desert_visualization_map.gif", caption="Food Desert Visualization Map", use_column_width=True)
+        
+        # Data Analysis Page Section
+        st.markdown("""
+        ### 📊 Data Analysis Page
+        Ready to roll up your sleeves? 💪 The Data Analysis Page is where you can dig deep into the data with interactive tools.
+        
+        🔧 **Features and How to Use Them**:
+        - 💸 **Family Income vs Race (2016-2020)**: Select different racial groups to compare family incomes. Watch the boxplot reveal income disparities and trends. 📈
+        - 🏪 **Employment in Convenience Stores Over Time**: Adjust the year slider to see how employment in convenience stores has changed. What does it mean for local food access? 🛒
+        - 🍽️ **Employment in Eating Establishments Over Time**: Explore trends in restaurants and fast food over the years. The slider is your time machine! ⏳
+        - 🛍️ **Employment in Convenience Stores, Liquor, and Tobacco Stores**: Analyze the economic impact of these stores with a grouped bar plot. Spot the trends! 🔍
+        - 🔥 **Correlation Heatmap**: Pick your variables and see how they relate. This heatmap is your go-to for discovering strong correlations. 🧩
+        - 🏡 **Baseline Analysis Median Family Income**: Visualize the economic conditions across Brooklyn. How does family income vary by tract? 🏘️
+        """)
+        # Add a placeholder for a GIF
+        st.image("path/to/your/data_analysis_slider_interaction.gif", caption="Interacting with Sliders on the Data Analysis Page", use_column_width=True)
+        
+        # Data Visualization Page Section
+        st.markdown("""
+        ### 🌍 Data Visualization Page
+        Maps, maps, and more maps! 🗺️ The Data Visualization Page is where you’ll explore food access across different regions.
+        
+        🌐 **LILA (Low Income, Low Access) Zones**:
+        - 🔍 **Purpose**: Identify areas classified as food deserts based on income and access criteria.
+        - 🎯 **How to Use**: Use the filters to zoom into specific areas and explore the extent of food deserts. This is your map to food accessibility! 🚶‍♂️
+        
+        🏪 **Supermarket Coverage Ratio**:
+        - 🔍 **Purpose**: See how well different regions are served by supermarkets. Are they getting the fresh food they need? 🍎
+        - 🎯 **How to Use**: Adjust the year slider to observe changes over time. Use the rank filter to focus on areas with the best or worst supermarket coverage. 📊
+        
+        🍔 **Fast Food Coverage Ratio**:
+        - 🔍 **Purpose**: Explore the density of fast-food outlets in different areas. Where are the fast-food hotspots? 🌭
+        - 🎯 **How to Use**: Similar to the Supermarket Coverage Ratio, adjust the filters to explore different regions and years. Which areas are dominated by fast food? 🍟
+        """)
+        # Add placeholders for GIFs or images
+        st.image("path/to/your/lila_zones_map.gif", caption="LILA Zones Map", use_column_width=True)
+        st.image("path/to/your/supermarket_coverage_map.gif", caption="Supermarket Coverage Ratio Map", use_column_width=True)
+        st.image("path/to/your/fast_food_coverage_map.gif", caption="Fast Food Coverage Ratio Map", use_column_width=True)
+        
+        # Food Policy Reports Page Section
+        st.markdown("""
+        ### 📄 Food Policy Reports Page
+        Dive into the policy side of things! 📜 The Food Policy Reports Page provides access to comprehensive reports on food policy in New York City.
+        
+        - 🔗 **Explore Reports**: Click on the links to read detailed reports on food metrics, compliance, and policy initiatives over the years. Stay informed with the latest data! 📚
+        """)
+        
+        # Comments Page Section
+        st.markdown("""
+        ### 💬 Comments Page
+        We value your feedback! 📝 The Comments Page is where you can share your thoughts, suggestions, and questions.
+        
+        - 🗣️ **How to Use**: Just type your comments into the text area provided. Your insights help us make this app even better! 💡
+        """)
+        
+        # Guide Page Section
+        st.markdown("""
+        ### 🧭 Guide Page
+        You’re here! 🙌 This is the page that helps you make the most out of the Food Desert Finder Application.
+        
+        - 🔄 **Need Help?**: Come back to this guide anytime you need a refresher. We’re here to help you navigate the app with ease! 🌟
         """)
 
-        # Navigation Section
-        st.markdown("""
-        ### 🧭 **Navigation Overview**
-        Our app is organized into several sections, each serving a unique purpose. Here's a quick breakdown:
-        
-        1. **🏠 Home**: Start here to get an overview of the project and understand the importance of addressing food deserts.
-        2. **📊 Data Analysis**: Dive deep into interactive data analysis with charts and plots that provide insights into various socio-economic factors related to food deserts.
-        3. **📈 Data Visualization**: Explore maps that show LILA Zones, Supermarket Coverage, and Fast Food Coverage to understand the food landscape better.
-        4. **📄 Food Policy Reports**: Access comprehensive reports on food policy in New York City, providing context and data-driven insights.
-        5. **💬 Comments**: Have feedback or thoughts? Share them with us in the Comments section.
-        6. **📖 Guide**: You are here! Use this page to learn how to navigate and use the application effectively.
-        
-        *Tip: You can switch between sections using the sidebar on the left. 📋*
-        """)
-        
-        # Detailed Section Descriptions
-        st.markdown("""
-        ### 🏠 **Home**
-        The Home page offers an introduction to the project. You’ll find a brief overview of food deserts, the criteria used to identify them, and a video explaining the importance of this project. 📹
-        - **Getting Started**: Begin by reading through the introduction to get a sense of the issue at hand.
-        - **Watch the Video**: If you prefer a visual summary, our video provides a quick overview. 🍿
-        
-        ### 📊 **Data Analysis**
-        In the Data Analysis section, you’ll find interactive charts and graphs that allow you to explore the data in detail. 📊
-        - **Interact with Charts**: Use the filters and sliders to customize the data you're viewing. This section helps you understand the socio-economic factors that contribute to food deserts.
-        - **Explore Insights**: Each chart is followed by a brief explanation to help you interpret the data. Make sure to read these to get the full picture! 🧠
-        
-        ### 📈 **Data Visualization**
-        This section features three interactive maps:
-        - **LILA Zones**: View areas classified as food deserts based on income and access to supermarkets. 🗺️
-        - **Supermarket Coverage**: See how well different areas are served by supermarkets. A lower coverage ratio indicates better access. 🛒
-        - **Fast Food Coverage**: Understand the density of fast-food outlets relative to the population. Higher coverage ratios can indicate less healthy food environments. 🍟
-        
-        *Tip: Click on different areas in the map to see detailed information about each location! 🧐*
-
-        ### 📄 **Food Policy Reports**
-        Access detailed reports on food policies in NYC. These reports provide valuable context and data that support the analysis in the other sections. 📚
-        - **Read Reports**: Click on the report links to view or download them. They are essential for understanding the broader policy context. 🔗
-        
-        ### 💬 **Comments**
-        We value your feedback! 📝
-        - **Share Your Thoughts**: Use this section to leave comments, suggestions, or questions. Your input helps us improve the app and address your concerns. 💬
-        
-        ### 📖 **Guide**
-        You're already here! The Guide section is designed to help you navigate the app and get the most out of its features. 🧭
-        
-        *Tip: If you ever feel lost, come back to the Guide page for help!*
-        """)
-        
-        # Closing Section
-        st.markdown("""
-        ### 🚀 **Ready to Explore?**
-        Now that you're familiar with the app's layout and features, dive in and start exploring! Whether you're analyzing data, visualizing maps, or reading policy reports, we hope this tool empowers you to make a difference in addressing food deserts.
-        
-        *Happy exploring!* 🎉
-        """)
 
 
 if __name__ == "__main__":
