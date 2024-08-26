@@ -687,8 +687,65 @@ def main():
         """)
 
     elif selection == "Comments":
-        st.write("Leave your comments here:")
-        st.text_area("Comments:")
+        st.title("💬 Share Your Thoughts and Feedback")
+    
+        # Introduction to the comments section
+        st.markdown("""
+        We'd love to hear from you! Your feedback helps us improve the Food Desert Finder Application. Whether you have suggestions, questions, or just want to share your experience, this is the place to do it. 💡
+        """)
+    
+        # Comment Input Section
+        st.markdown("### 📝 Leave Your Comment Below")
+        user_comment = st.text_area("What's on your mind?", placeholder="Type your comment here...")
+    
+        # Submit Button
+        if st.button("Submit"):
+            if user_comment:
+                # Load existing comments
+                comments_df = pd.read_csv("https://raw.githubusercontent.com/your-github-username/your-repo-name/main/comments.csv")
+    
+                # Add new comment to the DataFrame
+                new_comment = pd.DataFrame({"Comment": [user_comment]})
+                comments_df = pd.concat([comments_df, new_comment], ignore_index=True)
+    
+                # Save the updated comments back to the CSV file in GitHub
+                comments_df.to_csv("comments.csv", index=False)
+    
+                # Update the CSV file on GitHub
+                with open("comments.csv", "rb") as file:
+                    content = file.read()
+                encoded_content = base64.b64encode(content).decode()
+                url = "https://api.github.com/repos/your-github-username/your-repo-name/contents/comments.csv"
+                headers = {
+                    "Authorization": f"token {GITHUB_TOKEN}",
+                    "Content-Type": "application/json"
+                }
+                data = {
+                    "message": "New comment added",
+                    "content": encoded_content,
+                    "sha": "your-file-sha"  # replace with the latest sha value from the file on GitHub
+                }
+                response = requests.put(url, headers=headers, json=data)
+                if response.status_code == 200:
+                    st.success("Comment saved successfully! 🎉")
+                else:
+                    st.error("Failed to save the comment. Please try again. 😞")
+            else:
+                st.warning("Please write a comment before submitting. 📝")
+    
+        # Display recent comments
+        st.markdown("### 💬 Recent Comments")
+        comments_df = pd.read_csv("https://raw.githubusercontent.com/your-github-username/your-repo-name/main/comments.csv")
+        if not comments_df.empty:
+            for comment in comments_df["Comment"].tail(5):  # Display the last 5 comments
+                st.markdown(f"""
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; background-color: #f9f9f9;">
+                    {comment}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No comments yet. Be the first to leave one!")
+
 
     elif selection == "Guide":
 
@@ -766,8 +823,6 @@ def main():
         
         - 🔄 **Need Help?**: Come back to this guide anytime you need a refresher. We’re here to help you navigate the app with ease! 🌟
         """)
-
-
 
 if __name__ == "__main__":
     main()
